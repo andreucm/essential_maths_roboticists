@@ -1,2 +1,2 @@
 # essential_maths_roboticists
-Essential Maths for Roboticists
+Latex and scilab sources of my notes about Essential Maths for Roboticists
