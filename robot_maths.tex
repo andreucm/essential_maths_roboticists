@@ -1,0 +1,124 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+% The following packages can be found on http:\\www.ctan.org
+\usepackage{graphics} % for pdf, bitmapped graphics files
+\usepackage{epsfig} % for postscript graphics files
+\usepackage{mathptmx} % assumes new font selection scheme installed
+\usepackage{times} % assumes new font selection scheme installed
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{color, colortbl}
+
+% define colors
+\definecolor{Gray}{gray}{0.9}
+
+%opening
+\title{Essential Math Notes for Roboticists}
+\author{
+  Andreu Corominas-Murtra
+  \thanks{
+    Andreu Corominas-Murtra (andreu@beta-robots.com) is with Beta Robots (www.beta-robots.com) and IRI (www.iri.upc.edu).
+    This notes are published under the Creative Commons License. In case of reference, please cite it as: Corominas-Murtra, A. Essential Math Notes for Roboticists. On-line at xxx. 2015. }
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document is a running collection of math notes. They try to summarize in a clear and useful way the math essentials for advanced robotics. The focus is put more on the interpretation of math entities and results, instead on computation and numerical recipes. The aim is to build a self reference tool for our daily work, and to share it. 
+\end{abstract}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+\section{Notation}
+Main conventions and notation used through the document are listed below:
+
+$a,b,c,x,y,z,u,v,w,...$ are scalars.
+
+$\alpha,\beta,\theta,\phi$ are also scalars, by they usually represent angles. 
+
+$\mathbf{a,b,c,x,y,z,o,p,r,u,v,w,...}$ are vectors.
+
+$\mathbf{M,A,B,C,F,...}$ are matrices.
+
+$\mathbf{R}$ is a rotation matrix.
+
+$\mathbf{T}$ is a homogeneous transform matrix.
+
+$\mathbf{I}_n$ is the identity matrix of dimensions $n \times n$.
+
+$\mathcal{F}^C$ is the coordinate frame (shortly, frame) of body $C$.
+
+$\mathbf{x}^C$ is a vector referenced with respect to the $\mathcal{F}^C$ coordinate frame.
+
+$\mathbf{a}\in \mathbb{R}^3 \rightarrow \mathbf{a} = (a_x,a_y,a_z)^T$ are the components of a vector in 3D.
+
+$\mathbf{a}^C_x$ is the first component of $\mathbf{a}$ expressed in frame~$\mathcal{F}^C$.
+
+$i,j,k,l,.. \in \mathbb{Z}$ are usually running index over sets. 
+
+$t \in \mathbb{Z}$ is usually an iteration index.
+
+$\tau \in \mathbb{R}$ is usually a timestamp.
+
+$\tau_t \in \mathbb{R}$ is the timestamp of iteration $t$.
+
+$m,n,p,.. \in \mathbb{Z}$ are usually vector or matrix dimensions.
+
+$p \in \mathbb{Z}$ is also used as a degree index of some function or polynomial. 
+
+$\mathbf{q} = (q_r,q_x,q_y,q_z) = (a,b,c,d)$ is a quaternion. $q_r$ or~$a$ are the real parts.
+
+$\hat{\mathbf{x}}$ is an estimate of $\mathbf{x}$, which is an actual (unknown) quantity.
+
+\newpage
+\input{basic_trigonometry.tex}
+
+\newpage
+\input{basic_algebra_calculus.tex}
+
+\newpage
+\input{rigid_transformations.tex}
+
+\newpage
+\input{matrix_decompositions.tex}
+
+\newpage
+\input{differentation.tex}
+
+\newpage
+\input{linearization.tex}
+
+\newpage
+\input{random_variables.tex}
+
+\newpage
+\section{Linear System Solving}
+\subsection{Unweighted Linear Least Squares}
+\subsection{Weighted Linear Least Squares}
+
+\section{Kinematics and Dynamics}
+About how coordinate frames move according their velocities, rotational rates, positions and orientations. 
+
+\subsection{Wheel Kinematics}
+Cases of Wheeled platforms
+
+\subsection{Dynamics}
+Coriolis: cases: Feature point, people tracking, ...
+
+\section{Odometry}
+2D and 3D twist integration
+
+\section{State Estimation}
+KF, EKF, PF, Optimization, ...
+
+
+\bibliographystyle{plain}
+\bibliography{../../../papers/bib_references/references}
+
+\end{document}

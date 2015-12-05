@@ -1,0 +1,30 @@
+
+\section{Linearization}
+\label{sec:Linearization}
+\subsection{One-dimensional Taylor's Theorem}
+From [xx], the Taylor's theorem in for a one-dimensional function can be expressed as follows: Let $k \ge 1$ be an integer and let the function $f:\mathbb{R} \rightarrow \mathbb{R}$ be $k$ times differentiable at the point $a\in\mathbb{R}$. Then there exists a function $h_k:\mathbb{R} \rightarrow \mathbb{R}$ such that:
+\begin{equation}
+ f(x) = f(a) + \frac{\partial f }{\partial x}(a)(x-a) + \frac{1}{2!}\frac{\partial^2 f }{\partial x^2}(a)(x-a)^2 + \dots
+ + \frac{1}{k!}\frac{\partial^k f }{\partial x^k}(a)(x-a)^k + h_k(x)(x-a)^k.
+\end{equation}
+and $\lim_{x\to\infty}h_k(x)=0$.
+
+Basically, the Taylor's theorem is saying that in the point $x=a$, a function $f(x)$ can be approximated by computing the successive derivatives, from order~$0$ (which is the constant $f(a)$) up to order~$k$. Sometimes it is of great interest to have an approximation of a function around a point, so we can compute it fastly, or manipulate it easily. On particular case is when $k=1$, which is called a \textit{linearization} of the function, since the approximation takes into account just the first derivative $(k=1)$, so we have:
+\begin{equation}
+f(x) \approx f(a) + \frac{\partial f }{\partial x}(a)(x-a)
+\end{equation}
+Reacall that the approximation is only valid around the point $x=a$.
+
+\subsection{Multi-dimensional Taylor's Theorem (1st order)}
+Following the same idea, the Taylor's theorem is formulated for multi-variate functions such as:
+\begin{equation}
+ f:\mathbb{R}^n \rightarrow \mathbb{R}^m
+\end{equation}
+then the Taylor's Theorem up to the first order derivatives (linearization of~$f$ around the point~$\mathbf{a}$) is:
+\begin{equation}
+f(\mathbf{x}) \approx f(\mathbf{a}) + \mathbf{J}_f(\mathbf{a})(\mathbf{x}-\mathbf{a})
+\end{equation}
+
+
+% \paragraph{Example}
+% //TODO Example Rot velocity -> rot matrix 

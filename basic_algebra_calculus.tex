@@ -1,0 +1,274 @@
+
+\section{Basic Algebra and Calculus}
+
+\subsection{Functions}
+
+A real \textbf{scalar function} defined in the $\mathbb{R}^n$ domain is:
+\begin{equation}
+ z=f(\mathbf{x}):\mathbb{R}^n \rightarrow \mathbb{R}, 
+ \ \ z \in \mathbb{R}, \ \mathbf{x} \in \mathbb{R}^n.
+\end{equation}
+
+A real \textbf{vector function} defined in the $\mathbb{R}^n$ domain is:
+\begin{equation}
+ \mathbf{z}=f(\mathbf{x}):\mathbb{R}^n \rightarrow \mathbb{R}^m, 
+ \ \ \mathbf{z} \in \mathbb{R}^m, \ \mathbf{x} \in \mathbb{R}^n.
+\end{equation}
+
+\subsection{Norm, dot and cross products }
+
+The \textbf{scalar or dot product} between two vectors is:
+\begin{equation}
+<\mathbf{u},\mathbf{v}> = \mathbf{u}^T \cdot \mathbf{v} = \mathbf{u}^T \mathbf{v} = \sum_{i=0}^{n-1} u_{i} v_{i}
+, \ \ \mathbf{u},\mathbf{v} \in \mathbb{R}^n.
+\end{equation}
+The scalar product is a measure of the length of the projection of one vector over the axis of the other. 
+Therefore, the scalar product can be also interpreted as a measure of similarity.
+
+The $p$-\textbf{norm} of a vector is 
+\begin{equation}
+ \vert \mathbf{x} \vert _p = ( \sum_{i=0}^{n-1} x_{i}^p )^{\frac{1}{p}} \ .
+\end{equation}
+For $p = 2$, we found the \textbf{Euclidean norm}:
+\begin{equation}
+ \vert \mathbf{x} \vert _2 = \vert \mathbf{x} \vert = \sqrt{\sum_{i=0}^{n-1} x_{i}^2} = \mathbf{x}^T \mathbf{x}\ ,
+\end{equation}
+which is a measure of the length of $\mathbf{x}$, a fundamental concept.
+
+If a vector is divided by its norm, $\frac{\mathbf{x}}{ \vert \mathbf{x} \vert }$ we obtain a \textbf{normalized} version, which can be interpreted as a vector of unit length pointing to the same direction of $\mathbf{x}$. Thus, normalized vectors indicate directions and lie on the hypersphere of unit radius. In 3D this can be interpreted as an \textbf{spherical projection}.
+
+The scalar product between normalized $\mathbf{u}$ and $\mathbf{v}$ equals to the cosine of the angle between them:
+\begin{equation}
+ \frac{\mathbf{u}^T}{\vert \mathbf{u} \vert} \cdot \frac{\mathbf{v}}{\vert \mathbf{v} \vert} = 
+ \frac{\mathbf{u}^T\mathbf{v}^T}{\vert \mathbf{u} \vert \vert \mathbf{v} \vert} =
+ cos (\alpha) , \ \in [0,1]
+\end{equation}
+where $\alpha$ is the angle between vectors $\mathbf{u}$ and $\mathbf{v}$. This operation can be also interpreted as a similarity value between two normalized vectors. If normalized vectors are equal, the angle is 0, so the cosine is 1 (maximum similarity). Otherwise, if vectors are orthogonal, the angle is $\frac{\pi}{2}$, so the cosine results in 0 (minimum similarity). In the later case $\mathbf{u}$ and $\mathbf{v}$ span orthogonal directions. 
+
+The \textbf{cross product} between two vectors is only defined in $\mathbb{R}^3$
+\begin{equation}
+ \mathbf{u} \times \mathbf{v} = \mathbf{w} , \ \ \mathbf{u},\mathbf{v},\mathbf{w} \in \mathbb{R}^3, 
+\end{equation}
+and results in a new vector $\mathbf{w}$ which is orthogonal to both $\mathbf{u}$ and $\mathbf{v}$. Components of the resulting vector are computed as: 
+\begin{equation}
+\mathbf{w} = 
+\left[
+\begin{array}{ccc}
+  u_x\\
+  u_y\\
+  u_z\\
+\end{array}
+\right]
+\times
+\left[
+\begin{array}{ccc}
+  v_x\\
+  v_y\\
+  v_z\\
+\end{array}
+\right]
+ = 
+\left[
+\begin{array}{ccc}
+  u_y v_z - u_z v_y\\
+  u_z v_x - u_x v_z\\
+  u_x v_y - u_y v_x\\
+\end{array}
+\right]
+ \end{equation}
+Right hand rule, indicates forward direction of the resulting vector. That is, using the right hand, forefinger pointing as $u$, middle finger pointing following $v$, so the resulting $w$ is orthogonal to both, and points as thumb. 
+
+\begin{table}[h]
+\caption{Example of C++/Eigen code for norm, dot and cross products}
+\begin{tabular}
+[l]{|l|}
+\hline
+\rowcolor{Gray} \ttfamily \#include eigen3/Eigen/Geometry \\
+\rowcolor{Gray} \ttfamily void main() \\
+\rowcolor{Gray} \ttfamily \{ \\
+\rowcolor{Gray} \ttfamily \hspace{1cm} Eigen::Vector3d va; //a vector in $\mathbb{R}^3$\\ 
+\rowcolor{Gray} \ttfamily \hspace{1cm} Eigen::Vector<double,3> vb; //another vector in $\mathbb{R}^3$\\ 
+\rowcolor{Gray} \ttfamily \hspace{1cm} double norm\_va = va.norm(); //$|\mathbf{a}|$\\
+\rowcolor{Gray} \ttfamily \hspace{1cm} double dot\_vab = va.dot(vb); //$\mathbf{a}^T \cdot \mathbf{b}$\\
+\rowcolor{Gray} \ttfamily \hspace{1cm} Eigen::Vector3d cross\_vab = va.cross(vb);//$\mathbf{a}^T \times \mathbf{b}$\\
+\rowcolor{Gray} \ttfamily \} \\
+\hline
+\end{tabular}
+\label{tab:norm_dot_cross}
+\end{table}
+
+
+\subsection{Matrix Manipulation}
+A \textbf{matrix} is a rectangular array of numbers, so they are sorted in rows and columns:
+\begin{equation}
+\mathbf{A} \in \mathbb{R}^{m \times n}
+\left[
+\begin{array}{ccccc}
+  a_{00} & \dots & a_{0j} & \dots & a_{0n-1} \\
+  a_{10} & \dots & \dots & \dots & a_{1n-1} \\
+  \dots & \dots & \dots & \dots & \dots \\
+  a_{i0} & \dots & a_{ij} & \dots & a_{in-1} \\
+  \dots & \dots & \dots & \dots & \dots \\
+  a_{m-10} & \dots & a_{m-1j} & \dots & a_{m-1n-1} \\
+\end{array}
+\right]
+\end{equation}
+A matrix lies on a $\mathbb{R}^{m \times n}$ space, where the dimensions are the number of rows $m$, and the number of columns $n$. Element $a_{ij}$ represents a generic element of the matrix $\mathbf{A}$. Matrices are usually interpreted as a set of column or row vectors: a set of $m$ row vectors of dimension $n$, or a set of $n$ column vectors of dimension $m$. Following this interpretation, it can be written: 
+\begin{equation}
+\mathbf{A} = 
+\left[
+\begin{array}{c}
+  \bar{\mathbf{a}}_0 \\
+  \bar{\mathbf{a}}_1 \\
+  \dots \\
+  \bar{\mathbf{a}}_i \\
+  \dots \\
+  \bar{\mathbf{a}}_{m-1} \\
+\end{array}
+\right]
+ = 
+\left[
+\begin{array}{ccccc}
+  \mathbf{a}_0 & \dots & \mathbf{a}_j & \dots & \mathbf{a}_{n-1} \\
+\end{array}
+\right], 
+\end{equation}
+where $\bar{\mathbf{a}}_i$ means the row vector corresponding to row $i$. 
+
+A matrix is called \textbf{squared} when $n=m$.
+
+A matrix is called \textbf{diagonal} when $a_{ij}=0, \forall i\neq j$, and $a_{ij}\neq0, \forall i=j$
+
+A matrix is called \textbf{orthogonal} when its rows or columns are orthogonal vectors, which can be checked if their scalar product is zero.  
+
+A matrix is called \textbf{upper triangular} when $a_{ij}=0, \forall i>j$, and \textbf{lower triangular} when $a_{ij}=0, \forall i<j$.
+
+$\mathbf{I}_n$ is the identity matrix, which is a diagonal matrix with all non-zero elements set to 1. 
+
+The \textbf{sum} of two matrix is done element by element, so both matrix should have the same dimensions, as well as the resulting matrix:
+\begin{equation}
+\mathbf{A} = \mathbf{B} + \mathbf{C}, \ \mathbf{A}, \mathbf{B}, \mathbf{C} \in \mathbb{R}^{m \times n} \ \rightarrow a_{ij} = b_{ij} + c_{ij}
+\end{equation}
+
+The matrix \textbf{product}
+\begin{equation}
+\mathbf{A} = \mathbf{B}\ \mathbf{C}, \ 
+\mathbf{A} \in \mathbb{R}^{m \times n }, 
+\mathbf{B} \in \mathbb{R}^{m \times p }, 
+\mathbf{C} \in \mathbb{R}^{p \times n }
+\label{eq:mat_product}
+\end{equation}
+is computed as follows: 
+\begin{equation}
+a_{ij} = \bar{\mathbf{b}}_i \cdot \mathbf{c}_j = \sum_{i=0}^{p-1} b_{ip} c_{pj}. 
+\end{equation}
+Each resulting component can be viewed as a scalar product between $\bar{\mathbf{b}}_i$ and $\mathbf{c}_j$, 
+so all comments exposed above regarding the scalar product can be interpreted for the matrix product. Please note in equation~\ref{eq:mat_product} matrix dimensions of $\mathbf{B}$ and $\mathbf{C}$, and the resulting dimensions of $\mathbf{A}$. Matrix multiplication is allowed if and only if the number of columns of the first operand is equal to the number of rows of the second operand. Therefore, matrix multiplication is not a commutative operation in a general case. 
+
+The \textbf{rank} of a matrix is the minimum between the number of independent rows and the number of independent columns. An independent vector (row or column) means that it cannot be expressed as a linear combination of the other vectors (rows or columns) of the matrix. Therefore an independent vector adds a new dimension to the space the vectors of the matrix are spanning. 
+
+The \textbf{matrix determinant} is defined for squared matrices, and it is computed following this recursive expression: 
+\begin{equation}
+det(\mathbf{A}) = |\mathbf{A}| = \sum_{j=0..n-1} (-1)^{1+j}\ a_{ij}\ det(\mathbf{A}_{-0j})
+\end{equation}
+where $\mathbf{A}_{-0j}$ is the matrix composed by $\mathbf{A}$ but removing its first row and column~$j$. For $n=2$ this expression is reduced to:  
+\begin{equation}
+\left|
+\begin{array}{cc}
+  a_{00} & a_{01}\\
+  a_{10} & a_{11} \\
+\end{array}
+\right| = 
+a_{00}a_{11} - a_{01}a_{10}
+\end{equation}
+A matrix is called rank deficient or null-rank when its determinant is zero, meaning that some row or column can be expressed as a linear combination of other rows or columns respectively.
+
+The determinant is a measure of the hypervolume of the hyperellipsoide represented by matrix $\mathbf{A}$. 
+
+% \paragraph{Example~\ref{par:ex_determinant}}
+% \label{par:ex_determinant}
+% %Deteriminant as a measure of hipervolume, eigen vectors as the direction of ellipses major and minor axis, 
+% Let's see an example in 2D, where the hypervolume becomes the area. Given the matrix
+% \begin{equation}
+% \mathbf{A} = 
+% \left|
+% \begin{array}{cc}
+%   1.5 & 0.5\\
+%   0.5 & 2 \\
+% \end{array}
+% \right|
+% \end{equation}
+% which could be the resulting covariance matrix from some estimation process. We want to visualize what the determinant is showing, so we compute it: 
+% \begin{equation}
+%  |\mathbf{A}| = 1.5 \cdot 2 - 0.5 \cdot 0.5 = 2.75
+% \end{equation}
+
+
+The \textbf{transpose} of~$\mathbf{A}$, only defined for squared matrices, is~$\mathbf{A}^T$, where its elements exchange columns by rows: 
+\begin{equation}
+ \mathbf{A} = \{a_{ij}\}; \ \mathbf{A}^T =\{a_{ji}\} 
+\end{equation}
+
+
+Given a squared matrix~$\mathbf{A}$ of sizes $n \times n$, $\mathbf{A}^{-1}$ is the \textbf{inverse} of a $\mathbf{A}$, so it fulfills that $\mathbf{A}^{-1}$ is also squared $n \times n$ and:
+\begin{equation}
+ \mathbf{A}\mathbf{A}^{-1} = \mathbf{A}^{-1}\mathbf{A} = \mathbf{I}_n
+\end{equation}
+
+The following is a list of useful expressions~\cite{henderson80}, [...]: 
+\begin{align}
+ (\mathbf{A}^{-1})^{-1} & = \mathbf{A} \\
+ (\mathbf{A}^T)^{-1} & = (\mathbf{A}^{-1})^T \\
+ (a \mathbf{A})^{-1} & = a^{-1} \mathbf{A}^{-1}\\
+ (\mathbf{A}\mathbf{B})^T & = \mathbf{B}^T\mathbf{A}^T\\
+ (\mathbf{A}\mathbf{B})^{-1} & = \mathbf{B}^{-1}\mathbf{A}^{-1}\\
+ \mathbf{A}(\mathbf{B}+\mathbf{C}) & = \mathbf{A}\mathbf{B}+\mathbf{A}\mathbf{C}\\ 
+ (\mathbf{A}+\mathbf{B})^T & = \mathbf{A}^T + \mathbf{B}^T\\
+ (\mathbf{A}+\mathbf{B})^{-1} & = \mathbf{A}^{-1}-\mathbf{A}^{-1}\mathbf{B}(\mathbf{I}+\mathbf{A}^{-1}\mathbf{B})^{-1}\mathbf{A}^{-1}
+\end{align} 
+
+The following equation shows the \textbf{matrix inversion lemma}. It's a useful expression in situations where matrix $\mathbf{A}$ and~$\mathbf{C}$ are easy to invert, because they may be diagonal or have small dimension. In such case it can be applied:
+\begin{equation}
+ (\mathbf{A}+\mathbf{B}\mathbf{C}\mathbf{D})^{-1} = 
+  \mathbf{A}^{-1}-\mathbf{A}^{-1}\mathbf{B}\mathbf{C}(\mathbf{C}+\mathbf{C}\mathbf{D}\mathbf{A}^{-1}\mathbf{B}\mathbf{C})^{-1}
+  \mathbf{C}\mathbf{D}\mathbf{A}^{-1}
+\end{equation}
+The prove can be found at[ref], but it starts by multiplying at each side by $(\mathbf{A}+\mathbf{B}\mathbf{C}\mathbf{D})$.
+
+The \textbf{skew-symmetric matrix} in $\mathbb{R}^3$ is defined as a square matrix whose transpose is also its negative:
+\begin{equation}
+\mathbf{A} = 
+\left[
+\begin{array}{ccc}
+  0 & a & -b\\
+  -a & 0 & c\\
+  b & -c & 0\\
+\end{array}
+\right].
+\end{equation}
+The skew matrix can be useful to represent the vector product as a matrix-vector product. If $\mathbf{a}=[a_x,a_y,a_z]$ is a vector in $\mathbb{R}^3$, let be $\mathbf{A}$ the following matrix:
+\begin{equation}
+\mathbf{A}_s(\mathbf{a}) = \mathbf{A}_s 
+\left[
+\begin{array}{ccc}
+  0 & -a_z & a_y\\
+  a_z & 0 & -a_x\\
+  -a_y & a_x & 0\\
+\end{array}
+\right], 
+\end{equation}
+then the vector product of $\mathbf{a}\times\mathbf{b}$ can be expressed as:
+\begin{equation}
+ \mathbf{a}\times\mathbf{b} = \mathbf{A}_s\mathbf{b} 
+\end{equation}
+A \textbf{hermitian} matrix is that fulfilling: 
+\begin{itemize}
+ \item $\mathbf{A}$ is square $n\times n$.
+ \item $\mathbf{A} = (\mathbf{A}^T)^* \rightarrow a_{ij} = a_{ji}^*$
+\end{itemize}
+And a \textbf{positive-definite} matrix is that fulfilling: 
+\begin{itemize}
+ \item $\mathbf{A}$ is square $n\times n$.
+ \item $\mathbf{v}^T\mathbf{A}\mathbf{v} > 0, \ \forall\mathbf{v}\in \mathbb{R}^n$, and $\neq \mathbf{0} $.
+\end{itemize}
+Both later cases are commonly found in practical robotics applications and present interesting properties exploited by algebra programming libraries.

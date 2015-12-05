@@ -1,0 +1,58 @@
+
+\section{Differentation}
+
+Let $f(\mathbf{x})$ be a scalar function, where $\mathbf{x} \in \mathbb{R}^n$. A \textbf{partial derivative} of $f()$ with respect to the $i-th$ component $x_i$ is defined as: 
+\begin{equation}
+ \frac{\partial f(\mathbf{x}) }{\partial x_i}
+\end{equation}
+which is the magnitude of the slope of the function $f$ alongside dimension $x_i$. This value can be interpreted as how much senisitve is the function $f$ to changes in the $i-th$ component. Such measure of sensitivity is of major interest, for instance, to evaluate uncertainty effects. For the same function $f$, the \textbf{gradient} is defined as the following row vector:
+\begin{equation}
+ \nabla_{f(\mathbf(x))} = \nabla_f = \left[
+    \frac{\partial f }{\partial x_1} 
+    \dots
+    \frac{\partial f }{\partial x_j}
+    \dots
+    \frac{\partial f }{\partial x_n}
+    \right]
+\end{equation}
+The gradient vector indicates the direction and magnitude of the slope of the function $f$ at the point where it is evaluated, so it is also concept of major interest.  
+
+In the case where $f(\mathbf{x})$ is a vector function $\mathbb{R}^n \rightarrow \mathbb{R}^m$, it is also defined the \textbf{Jacobian} matrix as: 
+\begin{equation}
+ \mathbf{J}_f = 
+ \left[
+\begin{array}{ccccc}
+  \frac{\partial f_1 }{\partial x_1} & \dots & \frac{\partial f_1 }{\partial x_j} & \dots & \frac{\partial f_1 }{\partial x_n} \\
+  \frac{\partial f_2 }{\partial x_1} & \dots & \frac{\partial f_2 }{\partial x_j} & \dots & \frac{\partial f_2 }{\partial x_n} \\
+  \vdots & & \vdots & & \vdots \\
+  \frac{\partial f_i }{\partial x_1} & \dots & \frac{\partial f_i }{\partial x_j} & \dots & \frac{\partial f_i }{\partial x_n} \\
+  \vdots & & \vdots & & \vdots \\
+  \frac{\partial f_m }{\partial x_1} & \dots & \frac{\partial f_m }{\partial x_j} & \dots & \frac{\partial f_m }{\partial x_n} \\
+\end{array}
+\right] = 
+\left[
+\begin{array}{c}
+ \nabla_{f_1} \\
+ \nabla_{f_2} \\
+ \vdots \\
+ \nabla_{f_i} \\
+ \vdots \\
+ \nabla_{f_m}
+\end{array}
+\right]
+\end{equation}
+
+Finally, the \textbf{Hessian} matrix, defined for a function $f:\mathbb{R}^n \rightarrow \mathbb{R}$, is that of second order derivatives, defined as: 
+\begin{equation}
+ \mathbf{H}_f = 
+ \left[
+\begin{array}{ccccc}
+  \frac{\partial f }{\partial x_1 \partial x_1} & \dots & \frac{\partial f}{\partial x_1 \partial x_j} & \dots & \frac{\partial f }{\partial x_1 \partial x_n} \\
+  \frac{\partial f_2 }{\partial x_1} & \dots & \frac{\partial f_2 }{\partial x_j} & \dots & \frac{\partial f_2 }{\partial x_n} \\
+  \vdots & & \vdots & & \vdots \\
+  \frac{\partial f_i }{\partial x_1} & \dots & \frac{\partial f_i }{\partial x_j} & \dots & \frac{\partial f_i }{\partial x_n} \\
+  \vdots & & \vdots & & \vdots \\
+  \frac{\partial f_m }{\partial x_1} & \dots & \frac{\partial f_m }{\partial x_j} & \dots & \frac{\partial f_m }{\partial x_n} \\
+\end{array}
+\right] = 
+\end{equation}

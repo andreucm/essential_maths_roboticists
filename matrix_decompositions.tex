@@ -1,0 +1,100 @@
+
+\section{Matrix decompositions}
+Matrix decompositions are a set of methods that allow to express a single matrix as a product of several other matrix that may have special properties, such as they can be, for instance diagonal, triangular or rotation matrixes, so we can them apply properties, usually to speed up computation, or to better interpret main directions/components of a given matrix.
+
+\subsection{Eigen Decomposition}
+//TODO
+
+\subsection{Singular Value Decomposition (SVD)}
+
+\paragraph{Definition}
+Given a matrix $\mathbf{M}\in \mathbb{R}^{m\times n}$, the SVD decomposition is:
+\begin{equation}
+ \mathbf{M} = \mathbf{U} \mathbf{D} \mathbf{V}^T
+\end{equation}
+where $\mathbf{U} \in \mathbb{R}^{m\times m}$ is a squared orthogonal matrix , $\mathbf{D} \in \mathbb{R}^{m\times n}$ is a rectangular diagonal matrix with non-negative entries in the diagonal and $\mathbf{V} \in \mathbb{R}^{n\times n}$ is also a squared orthogonal matrix. Diagonal entries of $\mathbf{D}$ are known as \textbf{singular values}, while the $m$ columns of $\mathbf{U}$, as well as the $n$ columns of  $\mathbf{V}$ are called left-singular and right-singular vectors respectively. 
+
+\paragraph{Interpretation}
+In the common case of $\mathbf{M}\in \mathbb{R}^{m\times m}$, with $\vert \mathbf{M} \vert > 0$, SVD can be interpreted as a composition of three geometrical transforms: a rotation expressed by~$\mathbf{V}^T$, a scaling by~$\mathbf{D}$ and last rotation by~$\mathbf{U}$. Summarizing, $\mathbf{M}\mathbf{a}$ equals to: 
+\begin{equation}
+\begin{split}
+ \mathbf{V}^T\mathbf{a} \rightarrow rotation\\
+ \mathbf{D}(\mathbf{V}^T\mathbf{a}) \rightarrow scaling\\
+ \mathbf{U}(\mathbf{D}(\mathbf{V}^T\mathbf{a})) \rightarrow rotation\\
+\end{split}
+\end{equation}
+Singular values (entries at diagonal of $\mathbf{D}$) are the semiaxes of an ellipsoid in~$\mathbb{R}^m$. Therefore, this decomposition indicates which are the orthogonal directions spanned by a matrix. 
+
+\paragraph{Computing SVD}
+//TODO: Eigen and Scilab code
+
+\paragraph{Example in 2D}
+Given the following matrix: 
+\begin{equation}
+\mathbf{M} = 
+\left[
+ \begin{array}{cc}
+  2 &  0.5 \\
+  0.3 &  3 \\
+ \end{array}
+ \right]
+\end{equation}
+which is squared and with $|\mathbf{M}|>0$. Computing its SVD with a computer library leads to the following result: 
+\begin{equation}
+\tiny
+\mathbf{U} = 
+\left[
+ \begin{array}{cc}
+    0.3498021   &  0.9368236  \\
+    0.9368236  & - 0.3498021 \\
+ \end{array}
+ \right];\ \ 
+\mathbf{D} = 
+\left[
+ \begin{array}{cc}
+    3.1423116   &  0.         \\
+    0.          &  1.8616868  \\
+ \end{array}
+ \right];\ \ 
+\mathbf{V} = 
+\left[
+ \begin{array}{cc}
+    0.3120796 &    0.9500560  \\
+    0.9500560 &  - 0.3120796  \\
+ \end{array}
+ \right];\ \ 
+\end{equation}
+We can check that $\mathbf{M} = \mathbf{U} \mathbf{D} \mathbf{V}^T$
+
+\paragraph{Relation with Eigen Decomposition}
+The following relations hold between Eigen values and Singular values:
+\begin{itemize}
+ \item The left-singular vectors of~$\mathbf{M}$ are Eigenvectors of~$\mathbf{M}\mathbf{M}^T$. 
+ \item The right-singular vectors of~$\mathbf{M}$ are Eigenvectors of~$\mathbf{M}^T\mathbf{M}$.
+ \item The non-zero singular values of $\mathbf{M}$ (diagonal entries of~$\mathbf{D}$), are the square root of the non-zero Eigenvalues of both~$\mathbf{M}\mathbf{M}^T$ and~$\mathbf{M}^T\mathbf{M}$. 
+\end{itemize}
+
+
+\subsection{Cholesky}
+\paragraph{Definition}
+Cholesky decomposition allows to express a hermitian and positive-definite matrix~$\mathbf{A}$ as:
+\begin{equation}
+ \mathbf{A} = \mathbf{L}\mathbf{L}^*
+\end{equation}
+where $\mathbf{L}$ is a lower triangular matrix, with entries $l_{ij}\in \mathbb{R}^+$. Matrix~$\mathbf{A}$ has a unique Cholesky decomposition.
+
+\paragraph{Use in System Solving}
+Given a linear system with vector $\mathbf{x}$ as the unknown:
+\begin{equation}
+ \mathbf{A}\mathbf{x} = \mathbf{b}
+\end{equation}
+It can be solved by executing the following steps: 
+\begin{itemize}
+ \item $\mathbf{L} \leftarrow Cholesky(\mathbf{A})$
+ \item Solve $\mathbf{L}\mathbf{y}=\mathbf{b}$ by forward substitution.
+ \item Solve $\mathbf{L}^*\mathbf{x}=\mathbf{y}$ by backward substitution.
+\end{itemize}
+
+
+\subsection{QR}
+//TODO
