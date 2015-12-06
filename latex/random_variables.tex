@@ -32,38 +32,109 @@ p(a_n<\tilde{x}_1<b_n,\dots,a_n<\tilde{x}_n<b_n) =
 \end{equation}
 
 \subsection{Moments}
-A way to parameterize a distribution law is through its \textit{moments}, a set of parameters that can fully describe the distribution in some cases, or just approximate it in others. The most known moments are the mean, $\mu$, which is the fisrt order moment, and the variance, $\sigma^2$, which is the second order moment. %Third and fourth order moments are called skewness and kurtoise.  
+A way to parameterize a distribution law is through its \textit{moments}, a set of parameters that can fully describe the distribution in some cases, or just approximate it in others. The most known moments are the mean, $\mu$, which is the fisrt order moment, and the variance, $\sigma^2$, which is the second order moment.
 
-From a set of $n$ samples $\{x_1\dots x_n\}$, $x_i \in\mathbb{R}$, the mean and variance can be estimated as:
+In the unidimensional case, from a set of $p$ samples $\{x_1\dots x_p\}$, $x_i \in\mathbb{R}$, the mean and variance can be estimated as:
 \begin{equation}
- \mu_x = \frac{1}{n}\sum^n_{i=1} x_i;\ \ \ \sigma^2_x = \frac{1}{n-1}\sum^n_{i=1} (x_i-\mu_x)^2;
+ \mu_x = \frac{1}{p}\sum^p_{k=1} x_k;\ \ \ \sigma^2_x = \frac{1}{p-1}\sum^p_{k=1} (x_k-\mu_x)^2;
 \end{equation}
 
-In the multivariate case the mean becomes a vector, so it can be estimated as:
+In the multivariate case the mean becomes a vector, $\boldsymbol\mu_x\in\mathbb{R}^n$. Given~$p$ samples, it can be estimated as:
 \begin{equation}
- \boldsymbol\mu_x = \frac{1}{n}\sum^n_{i=1} \mathbf{x}_i;
+ \boldsymbol\mu_x = \frac{1}{p}\sum^p_{k=1} \mathbf{x}_k;
 \end{equation}
-and the second order moment can be \textit{cross}computed, so a \textit{covariance} matrix is used to describe this second order stathistics. This matrix is squared, and from a set of samples can be estimated as: 
+In that multivariate case, the second order moment can be \textit{cross}computed, so a \textit{covariance} matrix is used to describe the second order stathistics, which has the following squared form: 
 \begin{equation}
  \mathbf{C}_x = 
  \left[
- \begin{array}{ccccccc}
-  c11 &  & & & c1j &  & c1n \\
-  \vdots & & & \ddots & \vdots & & \vdots \\
-  ci1 &  & cii & & & & cin \\
-  \vdots & & & \vdots & \ddots & & \vdots \\
-  \vdots & & & & cij & & \vdots \\
-  \vdots & & & \vdots & \ddots & & \vdots \\
-  cn1 &  & & cnj & & & cnn \\
+ \begin{array}{cccccc}
+  c_{11} & \dots & \dots & c_{1j} & \dots & c_{1n} \\
+  \vdots &       &       & \vdots &       & \vdots \\
+  c_{i1} & \dots & \dots & c_{ij} & \dots & c_{in} \\
+  \vdots &       &       & \vdots &       & \vdots \\
+  c_{n1} & \dots & \dots & c_{nj} & \dots & c_{nn} \\
  \end{array}
- \right]
+ \right];
+\end{equation}
+From a set of~$p$ samples, the element $c_{ij}$ of the covariance matrix is estimated as follows: 
+\begin{equation}
+ c_{ij} = \frac{1}{p-1}\ (\mathbf{s}_{x_i}-\mu_{x_i})^T \cdot (\mathbf{s}_{x_j}-\mu_{x_j})
+\end{equation}
+where $\mathbf{s}_{x_i}$ is a vector stacking all $p$ samples of component~$i$ of the random variable~$\tilde{\mathbf{x}}$, and a subtracting a scalar from a vector means that we substract the scalar at all components of the vector. 
+
+\paragraph{Interpretation of Covariance Matrix}
+Recalling the interpretation of the scalar product as a measure of similarity between two vectors (subsection~\ref{subsec:norm_dot_cross}), the element $c_{ij}$ of a covariance matrix is encoding the alignment between the components~$i$ and~$j$ of the random variable~$\tilde{\mathbf{x}}$ in the set of~$p$ samples, once the mean is subtracted. Two components that suffer from the similar variations in the sample set, will appear as two vectors~$\mathbf{s}_{x_i}$ and~$\mathbf{s}_{x_j}$ nearly aligned, so its covariance~$c_{ij}$ will be close to $\frac{1}{p-1}$. In contrast, two components of the random variable~$\tilde{\mathbf{x}}$ that change without any relation, lead to two vectors~$\mathbf{s}_{x_i}$ and~$\mathbf{s}_{x_j}$ unaligned, so the scalar product, and thus the $c_{ij}$, will approach to~$0$.
+
+So, the covariance matrix builds a base of $n$ vectors (not necessarily orthogonal!) in the space of the random variable~$\tilde{\mathbf{x}}$ with directions according how individual components behave similarly or not in the dataset of~$p$ samples. SVD decomposition can be applied to find out the main orthogonal directions of this base. 
+
+\paragraph{Example \theexamplecounter. Compute a 2D covariance matrix from data [Scilab].}
+\stepcounter{examplecounter}
+In this example we'll generate two sample sets $S_1$ and $S_2$, each one composed by $100$ samples in~$\mathbb{R}^2$, so $100$ points $(x,y)$. $S_1$~is built forcing a strong linear relation between first and second component, while~$S_2$ is just computed by drawing random values for both components. The code below computes the covariance matrix for both sets.
+\begin{mdframed}
+\tiny
+\begin{verbatim} 
+//user entries
+mm = 0.3;
+bb = 0;
+noise_stdev = 0.3; //sqrt(noise_variance)
+
+//create set S1
+xx1 = [0:0.1:10]';
+[nn cols] = size(xx1); //get set size
+yy1 = mm*xx1 + bb + noise_stdev*rand(nn,1,"normal");
+
+//create set S2
+xx2 = noise_stdev*rand(nn,1,"normal");
+yy2 = noise_stdev*rand(nn,1,"normal");
+
+//compute means, each component, each set:
+mx1 = sum(xx1)/nn;
+my1 = sum(yy1)/nn;
+mx2 = sum(xx2)/nn;
+my2 = sum(yy2)/nn;
+
+//compute covariance matrix explicitly
+cxx1 = (xx1-mx1)'*(xx1-mx1)/(nn-1);
+cyy1 = (yy1-my1)'*(yy1-my1)/(nn-1);
+cxy1 = (xx1-mx1)'*(yy1-my1)/(nn-1);
+cxx2 = (xx2-mx2)'*(xx2-mx2)/(nn-1);
+cyy2 = (yy2-my2)'*(yy2-my2)/(nn-1);
+cxy2 = (xx2-mx2)'*(yy2-my2)/(nn-1);
+
+//compute covariance matrix with scilab call
+C1 = cov(xx1,yy1);
+C2 = cov(xx2,yy2);
+\end{verbatim} 
+\end{mdframed}
+The resulting covariance matrices are:
+\begin{equation}
+\small
+\mathbf{C}_1 = 
+\left[
+ \begin{array}{cc}
+    8.585      &  2.6312156  \\
+    2.6312156  &  0.8963398  \\
+ \end{array}
+ \right];\ \ 
+\mathbf{C}_2 = 
+\left[
+ \begin{array}{cc}
+    0.0930911  & - 0.0006647  \\
+  - 0.0006647  &  0.0884355   \\
+ \end{array}
+ \right];\ \ 
 \end{equation}
 
-%comments about main directions represented in the covariance matrix. 
-%example drawing an ellipses from a covariance matrix
-%example drawing a bbox from a covariance matrix
-%example PCA
 
+\paragraph{Example \theexamplecounter. Bounding box from a set of 2D points.}
+\stepcounter{examplecounter}
+
+\paragraph{Example \theexamplecounter. Ellipses from a 2D covariance matrix.}
+\stepcounter{examplecounter}
+
+
+% \subsection{Higher order moments}
+% Third and fourth order moments are called skewness and kurtoise.  
 
 \subsection{Uniform distribution}
 A random variable or vector is called uniform when the density is constant over a bounded interval, meaning that the variable is equally distributed within this interval. That implies also that the variable can take, with equal probability, values within this interval. 
@@ -114,7 +185,7 @@ In case of $n$-dimensional Gaussian variables, the mean is $\boldsymbol{\mu} \in
   \begin{center}
     \includegraphics[width=1.0\columnwidth]{figures/mv_gaussian.eps}
     \caption{Bivariate Gaussian function}
-    \label{fig:trigonometry}
+    \label{fig:mv_gaussian}
   \end{center}
 \end{figure}
 

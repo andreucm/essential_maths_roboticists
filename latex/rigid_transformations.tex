@@ -30,7 +30,8 @@ If a third frame~$\mathcal{F}^C$ is also rotated with respect to frame~$\mathcal
 Please be careful with the sequence of the matrix product representing the chain, since matrices are ordered from right to left, starting from the \textit{outer} rotation up to the \textit{inner} one. In the 3D case, computing~$\mathbf{R}^A_C$ requires 27 multiplications and 18 additions. 
 
 
-\paragraph{Example in 2D}
+\paragraph{Example \theexamplecounter. Rotations in 2D}
+\stepcounter{examplecounter}
 In 2D, if frame~$\mathcal{F}^B$ is rotated by~$\alpha=30^o$ degrees with respect to frame~$\mathcal{F}^A$, the matrix representing this rotation is as follows: 
 \begin{equation}
 \mathbf{R}^A_B = 
@@ -253,7 +254,7 @@ When frame~$B$ is both rotated and translated with respect to frame~$A$, we appl
 \begin{figure}[bth!]
   \begin{center}
     \includegraphics[width=1.0\columnwidth]{figures/rotation_translation.eps}
-    \caption{Example of frame B, rotated and translated with respect to frame A.}
+    \caption{A frame B, rotated and translated with respect to frame A.}
     \label{fig:rotation_translation}
   \end{center}
 \end{figure}
@@ -319,7 +320,8 @@ Homogeneous matrixes also allow chaining as rotations do:
  = \mathbf{T}^A_C \mathbf{v}^C
 \end{equation}
 
-\paragraph{Example}
+\paragraph{Example \theexamplecounter. Vehicle frames.}
+\stepcounter{examplecounter}
 As Figure~\ref{fig:world_vehicle_sensor_frames} draws, imagine we have a vehicle well localized at point $p^O=\left[p^O_x\ p^O_y\right]^T$ and oriented an angle~$\theta$ with respect to the origin of the trajectory. This vehicle has a sensor mounted at the known position~$m^B=[m^B_x\ m^B_y]$ and oriented an angle~$\beta$ with respect to the base frame of the vehicle. Finally this sensor has detected a point of interest at~$q^S=[q^S_x\ q^S_y]$. Which are the coordinates of the point of interest with respect to the base frame, and with respect to the origin of the trajectory ?
 \begin{figure}[bth!]
   \begin{center}

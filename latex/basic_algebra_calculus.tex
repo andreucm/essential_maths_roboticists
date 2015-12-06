@@ -16,6 +16,7 @@ A real \textbf{vector function} defined in the $\mathbb{R}^n$ domain is:
 \end{equation}
 
 \subsection{Norm, dot and cross products }
+\label{subsec:norm_dot_cross}
 
 The \textbf{scalar or dot product} between two vectors is:
 \begin{equation}
@@ -78,24 +79,25 @@ and results in a new vector $\mathbf{w}$ which is orthogonal to both $\mathbf{u}
  \end{equation}
 Right hand rule, indicates forward direction of the resulting vector. That is, using the right hand, forefinger pointing as $u$, middle finger pointing following $v$, so the resulting $w$ is orthogonal to both, and points as thumb. 
 
-\begin{table}[h]
-\caption{Example of C++/Eigen code for norm, dot and cross products}
-\begin{tabular}
-[l]{|l|}
-\hline
-\rowcolor{Gray} \ttfamily \#include eigen3/Eigen/Geometry \\
-\rowcolor{Gray} \ttfamily void main() \\
-\rowcolor{Gray} \ttfamily \{ \\
-\rowcolor{Gray} \ttfamily \hspace{1cm} Eigen::Vector3d va; //a vector in $\mathbb{R}^3$\\ 
-\rowcolor{Gray} \ttfamily \hspace{1cm} Eigen::Vector<double,3> vb; //another vector in $\mathbb{R}^3$\\ 
-\rowcolor{Gray} \ttfamily \hspace{1cm} double norm\_va = va.norm(); //$|\mathbf{a}|$\\
-\rowcolor{Gray} \ttfamily \hspace{1cm} double dot\_vab = va.dot(vb); //$\mathbf{a}^T \cdot \mathbf{b}$\\
-\rowcolor{Gray} \ttfamily \hspace{1cm} Eigen::Vector3d cross\_vab = va.cross(vb);//$\mathbf{a}^T \times \mathbf{b}$\\
-\rowcolor{Gray} \ttfamily \} \\
-\hline
-\end{tabular}
-\label{tab:norm_dot_cross}
-\end{table}
+\paragraph{Example \theexamplecounter. Code for norm, dot and cross products [C++/Eigen]}
+\stepcounter{examplecounter}
+
+% \begin{tcolorbox}
+\begin{mdframed}
+\begin{verbatim} 
+#include eigen3/Eigen/Geometry 
+ void main() 
+ { 
+    Eigen::Vector3d va; //va is a vector in R^3
+    Eigen::Vector<double,3> vb; //vb is another vector in R^3
+    va << 1,2,3; //fill the vector va
+    vb << -1,-1,0; //fill the vector vb
+    double norm_va = va.norm(); //|va|
+    double dot_vab = va.dot(vb); //va^T · vb
+    Eigen::Vector3d cross_vab = va.cross(vb);//va x vb 
+ }  
+\end{verbatim}
+\end{mdframed}
 
 
 \subsection{Matrix Manipulation}

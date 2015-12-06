@@ -1,4 +1,4 @@
-\documentclass[a4paper,10pt]{article}
+\documentclass[a4paper,11pt]{article}
 \usepackage[utf8]{inputenc}
 
 % The following packages can be found on http:\\www.ctan.org
@@ -9,6 +9,16 @@
 \usepackage{amsmath} % assumes amsmath package installed
 \usepackage{amssymb}  % assumes amsmath package installed
 \usepackage{color, colortbl}
+\usepackage{bm}
+\usepackage{mdframed} %frame text
+
+%page layout: https://en.wikibooks.org/wiki/LaTeX/Page_Layout
+\usepackage{fullpage}
+
+%example counter
+\newcounter{examplecounter}
+%\stepcounter{examplecounter}
+
 
 % define colors
 \definecolor{Gray}{gray}{0.9}
@@ -96,6 +106,7 @@ $\hat{\mathbf{x}}$ is an estimate of $\mathbf{x}$, which is an actual (unknown) 
 
 \newpage
 \input{random_variables.tex}
+
 
 \newpage
 \section{Linear System Solving}

@@ -25,10 +25,10 @@ In the common case of $\mathbf{M}\in \mathbb{R}^{m\times m}$, with $\vert \mathb
 \end{equation}
 Singular values (entries at diagonal of $\mathbf{D}$) are the semiaxes of an ellipsoid in~$\mathbb{R}^m$. Therefore, this decomposition indicates which are the orthogonal directions spanned by a matrix. 
 
-\paragraph{Computing SVD}
-//TODO: Eigen and Scilab code
 
-\paragraph{Example in 2D}
+\paragraph{Example \theexamplecounter. SVD in 2D}
+\stepcounter{examplecounter}
+//TODO: Eigen and Scilab code
 Given the following matrix: 
 \begin{equation}
 \mathbf{M} = 
@@ -41,26 +41,26 @@ Given the following matrix:
 \end{equation}
 which is squared and with $|\mathbf{M}|>0$. Computing its SVD with a computer library leads to the following result: 
 \begin{equation}
-\tiny
+\small
 \mathbf{U} = 
 \left[
  \begin{array}{cc}
-    0.3498021   &  0.9368236  \\
-    0.9368236  & - 0.3498021 \\
+    0.349802   &  0.936824  \\
+    0.936824  & - 0.349802 \\
  \end{array}
  \right];\ \ 
 \mathbf{D} = 
 \left[
  \begin{array}{cc}
-    3.1423116   &  0.         \\
-    0.          &  1.8616868  \\
+    3.142312   &  0.         \\
+    0.          &  1.861687  \\
  \end{array}
  \right];\ \ 
 \mathbf{V} = 
 \left[
  \begin{array}{cc}
-    0.3120796 &    0.9500560  \\
-    0.9500560 &  - 0.3120796  \\
+    0.312080 &    0.950056  \\
+    0.950056 &  - 0.312080  \\
  \end{array}
  \right];\ \ 
 \end{equation}
