@@ -262,6 +262,7 @@ When frame~$B$ is both rotated and translated with respect to frame~$A$, we appl
 
 
 \subsection{Homogeneous matrix}
+\label{subsec:homogeneous_matrix}
 Homogeneous matrix is a compact way to represent both rotation and translation in a single matrix, by adding an extra dimensionality to the rotation matrix.  
 The homogeneous matrix representing the frame~$B$ in terms of the frame~$A$ (both rotation and translation) is defined as:
 \begin{equation}
@@ -321,6 +322,7 @@ Homogeneous matrixes also allow chaining as rotations do:
 \end{equation}
 
 \paragraph{Example \theexamplecounter. Vehicle frames.}
+%\label{example:vehicle_frames}
 \stepcounter{examplecounter}
 As Figure~\ref{fig:world_vehicle_sensor_frames} draws, imagine we have a vehicle well localized at point $p^O=\left[p^O_x\ p^O_y\right]^T$ and oriented an angle~$\theta$ with respect to the origin of the trajectory. This vehicle has a sensor mounted at the known position~$m^B=[m^B_x\ m^B_y]$ and oriented an angle~$\beta$ with respect to the base frame of the vehicle. Finally this sensor has detected a point of interest at~$q^S=[q^S_x\ q^S_y]$. Which are the coordinates of the point of interest with respect to the base frame, and with respect to the origin of the trajectory ?
 \begin{figure}[bth!]

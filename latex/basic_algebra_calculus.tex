@@ -41,7 +41,7 @@ If a vector is divided by its norm, $\frac{\mathbf{x}}{ \vert \mathbf{x} \vert }
 The scalar product between normalized $\mathbf{u}$ and $\mathbf{v}$ equals to the cosine of the angle between them:
 \begin{equation}
  \frac{\mathbf{u}^T}{\vert \mathbf{u} \vert} \cdot \frac{\mathbf{v}}{\vert \mathbf{v} \vert} = 
- \frac{\mathbf{u}^T\mathbf{v}^T}{\vert \mathbf{u} \vert \vert \mathbf{v} \vert} =
+ \frac{\mathbf{u}^T\mathbf{v}}{\vert \mathbf{u} \vert \vert \mathbf{v} \vert} =
  cos (\alpha) , \ \in [0,1]
 \end{equation}
 where $\alpha$ is the angle between vectors $\mathbf{u}$ and $\mathbf{v}$. This operation can be also interpreted as a similarity value between two normalized vectors. If normalized vectors are equal, the angle is 0, so the cosine is 1 (maximum similarity). Otherwise, if vectors are orthogonal, the angle is $\frac{\pi}{2}$, so the cosine results in 0 (minimum similarity). In the later case $\mathbf{u}$ and $\mathbf{v}$ span orthogonal directions. 

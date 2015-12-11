@@ -1,6 +1,6 @@
 //user entries
 mm = 0.3;
-bb = 0;
+bb = 0.5;
 noise_stdev = 0.3; //sqrt(noise_variance)
 
 //create set S1

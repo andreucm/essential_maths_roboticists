@@ -124,41 +124,66 @@ The resulting covariance matrices are:
  \end{array}
  \right];\ \ 
 \end{equation}
-
-
-\paragraph{Example \theexamplecounter. Bounding box from a set of 2D points.}
-\stepcounter{examplecounter}
+The resulting matrices show how the set $S_1$ presents a much higher relation between~$x$ and~$y$ components than~$S_2$, due to the linear relation imposed when building the sets. Moreover, the fact that the values in~$C_1$ are much larger is caused because~$S_1$ stretches in the $XY$ plane occupying a larger region than~$S_2$.
 
 \paragraph{Example \theexamplecounter. Ellipses from a 2D covariance matrix.}
 \stepcounter{examplecounter}
+This example shows a Scilab function to draw a 2D ellipses from a covariance matrix, centered at a given $(x,y)$ point. Numerical errors can lead to non-positive-definite covariance matrixes after some computational steps. Therefore, the first calls in the function are related to ensure that the matrix is strictly positive-definite, a necessary condition to assure eigenvalues are real (TBC!!). Positive-definite is ensured through a Cholesky decomposition. Thereafter, eigenvalues are computed, which directly provide the length of a major and minor axes of the ellipses. Finally, drawing is performed point by point over the ellipses, with steps of $0.1$ radian. 
+\begin{mdframed}
+\tiny
+\begin{verbatim} 
+//covariance matrix Cmat, and centered at point mu
+function[] = draw_ellispes_from_cov(mu, Cmat, axes_h)
+
+    //ensure positive-definite matrix
+    Cchol = chol(Cmat);
+    CC = Cchol'*Cchol;  
+    
+    //compute eigenvalues
+    [RR,diagCC] = spec(CC);
+    eval1 = diagCC(1,1);
+    eval2 = diagCC(2,2);
+    
+    //sort evals by value. Set major and minor axes.
+    if (eval1>eval2) then
+        axis = [eval1;eval2;atan(RR(2,1)];
+    else
+        axis = [eval2;eval1;atan(RR(2,2)];
+    end
+
+    //start drawing (compute all points) 
+    step = 0.1; //Set drawing step    
+    t = 0:step:%pi/2; //set drawing vector
+    eX = axis(1)*cos(t); //ellispes points (X component, a quarter)
+    eY = axis(2)*sin(t); //ellipses points (Y component, a quarter)
+    nn = 4*size(eX,'*'); //num of total points of the ellipses
+    eXY1 = [eX, -flipdim(eX,2), -eX, flipdim(eX,2); eY, flipdim(eY,2), -eY, -flipdim(eY,2)];
+    eXY = rotate(eXY1, axis(3)) + [mu(1)*ones(1,nn);mu(2)*ones(1,nn)];
+    sca(axes_h); //Set current axes
+    xpoly(eXY(1,:), eXY(2,:));
+
+endfunction
+\end{verbatim} 
+\end{mdframed}
+
+
+
+
+% \paragraph{Example \theexamplecounter. Bounding box from a set of 2D points.}
+% \stepcounter{examplecounter}
 
 
 % \subsection{Higher order moments}
-% Third and fourth order moments are called skewness and kurtoise.  
+% Third and fourth order moments are called skewness and kurtosis.  
 
 \subsection{Uniform distribution}
 A random variable or vector is called uniform when the density is constant over a bounded interval, meaning that the variable is equally distributed within this interval. That implies also that the variable can take, with equal probability, values within this interval. 
 
 Uniform random variables can be described with just two parameters: $x_{min}, x_{max}$. The mean and the variance values of an unfiorm random variable are:
 \begin{equation}
- \mu_{\tilde{x}} = \frac{x_{min}+x_{max}}{2}; \ \ 
- %\sigma^2_{\tilde{x}} = //TODO
+ \mu_{\tilde{x}} = \frac{x_{min}+x_{max}}{2}; \ \ \sigma^2_{\tilde{x}} = \frac{1}{12}(x_{max}-x_{min})^2
 \end{equation}
-
-% \begin{table}[h]
-% \caption{Example of C++/std code for uniform random generator}
-% \begin{tabular}
-% [l]{|l|}
-% \hline
-% \rowcolor{Gray} \ttfamily \#include xx \\
-% \rowcolor{Gray} \ttfamily void main() \\
-% \rowcolor{Gray} \ttfamily \{ \\
-% \rowcolor{Gray} \ttfamily \hspace{1cm} //TODO; 
-% \rowcolor{Gray} \ttfamily \} \\
-% \hline
-% \end{tabular}
-% \label{tab:random}
-% \end{table}
+%TODO: Example of C++/std code for uniform random generator}
 
 \subsection{Gaussian distribution}
 A random variable is called Gaussian or Normal, when its density is fully described with two parameters, $\mu_{\tilde{x}}$ (mean) and $\sigma^2_{\tilde{x}}$ (standard deviation), and the following expression:
@@ -167,20 +192,19 @@ A random variable is called Gaussian or Normal, when its density is fully descri
 \end{equation}
 Gaussian variables are also written as $\mathcal{N}(\mu,\sigma)$, which is a widely used notation stressing the dependency with just two parameters. Given $\tilde{x}=\mathcal{N}(\mu_x,\sigma_x)$ and $\tilde{y}=\mathcal{N}(\mu_y,\sigma_y)$, the following properties fulfill:
 \begin{itemize}
- \item $\tilde{z}=a\tilde{x} \ \ \rightarrow \tilde{z}=\mathcal{N}(a\mu_x,a\sigma_x)$
- \item $\tilde{z}=\tilde{x}+\tilde{y} \ \ \rightarrow \tilde{z}=\mathcal{N}(\mu_x+\mu_y,\sqrt{\sigma^2_x+\sigma^2_y})$
+ \item $\tilde{z}=a\tilde{x} \ \rightarrow \tilde{z}=\mathcal{N}(a\mu_x,a\sigma_x)$
+ \item $\tilde{z}=\tilde{x}+\tilde{y} \ \rightarrow \tilde{z}=\mathcal{N}(\mu_x+\mu_y,\sqrt{\sigma^2_x+\sigma^2_y})$
 \end{itemize}
 The two properties listed above are of major importance since they imply that we know how Gaussian variables behave when they pass through linear systems. 
-
 %example code for normal random generator and then computation of mean and variance
 
 \subsection{Multivariate Gaussian distribution}
+\label{subsec:mulivariate_gaussian_distribution}
 In case of $n$-dimensional Gaussian variables, the mean is $\boldsymbol{\mu} \in \mathbb{R}^n$, and the covariance is represented as a squared matrix, $\mathbf{C}\in\mathbb{R}^{n\times n}$. The generalized formula is the following: 
 \begin{equation}
  F_{\tilde{x}}(\mathbf{x}) = \frac{1}{\sqrt{\vert \mathbf{C}\vert}(2\pi)^n}
 			    e^{-\frac{1}{2}(\mathbf{x}-\boldsymbol\mu)^T\mathbf{C}^{-1}(\mathbf{x}-\boldsymbol\mu)}
 \end{equation}
-
 \begin{figure}[bth!]
   \begin{center}
     \includegraphics[width=1.0\columnwidth]{figures/mv_gaussian.eps}
@@ -189,15 +213,235 @@ In case of $n$-dimensional Gaussian variables, the mean is $\boldsymbol{\mu} \in
   \end{center}
 \end{figure}
 
-The main operations are,
-
+In the multivariate case, the properties ariund the sum and the linear operation also fulfill: 
+\begin{itemize}
+ \item $\tilde{\mathbf{z}}=\mathbf{A}\tilde{\mathbf{x}} \ 
+      \rightarrow \tilde{\mathbf{z}}=\mathcal{N}(\mathbf{A}\boldsymbol\mu_x,\mathbf{A}\mathbf{C}_x\mathbf{A}^T)$, 
+      where $\mathbf{A}\in \mathbb{R}^{m \times n}$.
+ \item $\tilde{z}=\tilde{x}+\tilde{y} \ 
+      \rightarrow \tilde{z}=\mathcal{N}(\mu_x+\mu_y,\sqrt{\sigma^2_x+\sigma^2_y})$
+\end{itemize}
 
 
 \subsection{Gaussian Uncertainty Propagation}
 How uncertainty is propagated through different physical or computing processes is a major topic in robotics, specially in perception, but also in precise actuation. Specifically, we are interested in know how a density function reshapes due to some computation, view point change, ...
 
-In previous subsections we've seen that Gaussian random variables and vectors have the great property that it is easy (conceptually, but computationally also) to compute their parameters once they pass through linear operations (product by scalar and sum). We've also seen in section~\ref{sec:Linearization} that non-linear functions can be linearized, by assuming a linearization error. Therefore, linearization and Gaussian uncertainty propagation are two operations very common in many robotics algorithms. 
+In previous subsections we've seen that Gaussian random variables and vectors have the great property that it is easy (not only conceptually but also computationally) to compute their parameters once they pass through linear operations (product by scalar and sum). We've also seen in section~\ref{sec:Linearization} that non-linear functions can be linearized, by assuming a linearization error. Therefore, linearization and Gaussian uncertainty propagation are two operations very common in many robotics algorithms. At intuitive level, linearization remains valid as long as uncertainty is enough \textit{small} with respect to how the function changes (indicated by Jacobian). 
 
-//procedure: TODO: vector function, Jacobian, $APA^T$
+\paragraph{Example \theexamplecounter. Vehicle frames revisited (with uncertainty)}
+\stepcounter{examplecounter}
+Let's come back to example presented in subsection~\ref{subsec:homogeneous_matrix}. However, now we will focus only in the system vehicle-sensor-point, but we will introduce several uncertainty sources. First of all, the point~$q$ is reported by a sensor in polar coordinates $(q_r,q_{\alpha})$. The datasheet of of that sensor indicates standard deviations for range measurement and azimuth~$\sigma_r$ and~$\sigma_{\alpha}$ respectively. So the covariance matrix of a point~$q$ at the measurement space $(r,\alpha)$ is:
+\begin{equation}
+ \mathbf{C}^{r\alpha}_q = 
+ \left[
+ \begin{array}{cc}
+ \sigma^2_r & 0                \\
+ 0          & \sigma^2_{\alpha} \\
+ \end{array}
+ \right]
+\end{equation}
+Point~$q$ in the homogeneous space, with respect to the sensor frame, is computed as:
+\begin{equation}
+\left[
+\begin{array}{c}
+    \mathbf{q}_S\\
+    1 \\
+ \end{array}
+\right]
+=
+ \left[
+ \begin{array}{c}
+ q^S_x \\
+ q^S_y \\
+ 1
+ \end{array}
+ \right]
+  =
+ \left[
+ \begin{array}{c}
+ q_r \cos \alpha \\
+ q_r \sin \alpha \\
+ 1
+ \end{array}
+ \right]
+\end{equation}
+The equation above is not linear in the random variable, $[r\ \alpha]^T$, so to propagate the uncertainty from the measurement space $(r\alpha)$, to the homogeneous one $(xy1)$, we have to linearize this equation. From the section~\ref{sec:Linearization}, we learned that multivariate functions required the Jacobian to be computed in order to linearize the function around a point of interest, $(q_r,q_{\alpha})$:
+\begin{equation}
+ \mathbf{J}_{r\alpha} = 
+ \left[
+ \begin{array}{cc}
+ \cos \alpha  & -r\sin \alpha \\
+ \sin \alpha  &  r\cos \alpha \\
+ 0	      & 0	      \\
+ \end{array}
+ \right]
+\end{equation}
+Once we know the (approximative) linear relation between~$q^S$ and~$q^{r\alpha}$, we can propagate the uncertainty by using the properties of how Gaussian ranodm variables modify through linear systems, as discussed in subsection~\ref{subsec:mulivariate_gaussian_distribution}:
+\begin{equation}
+ \mathbf{C}^S_q = \mathbf{J}_{r\alpha}\mathbf{C}^{r\alpha}_q\mathbf{J}_{r\alpha}^T
+\end{equation}
+where the Jacobian has to be evaluated at the point~$(q^r,q^{\alpha})$. Thereafter, we want to compute the uncertain point~$q$ with respect to the vehicle frame. At this frame, the point is affected by two sources of uncertainty:
+\begin{itemize}
+ \item Propagation of the uncertainty of $q^S$ to the new frame~$(\mathbf{C}^{B1}_q)$.
+ \item New uncertainty introduced by calibration innaccuracies of sensor mounting point on-board the vehicle~$(\mathbf{C}^{B2}_q)$.
+\end{itemize}
+So the final covariance matrix of the point, with respect to the vehicle frame, would be like the sum of two contributions:
+\begin{equation}
+ \mathbf{C}^{B}_q = \mathbf{C}^{B1}_q + \mathbf{C}^{B2}_q
+\end{equation}
+Let's start computing $\mathbf{C}^{B1}_q$. Recalling to the example in subsection~\ref{subsec:homogeneous_matrix}, the point~$\mathbf{q}^S$ is expressed with respect to the vehicle frame as:
+\begin{equation}
+\left[
+ \begin{array}{c}
+  \mathbf{q}^B\\
+  1 \\
+ \end{array}
+\right] 
+= 
+\mathbf{T}^B_S 
+\left[
+\begin{array}{c}
+    \mathbf{q}_S\\
+    1 \\
+ \end{array}
+\right];\\
+\end{equation}
+so in that case, the relation is linear with the random variable~$q^S$, so we can apply directly the covariance propagation equation without having to linearize:
+\begin{equation}
+ \mathbf{C}^{B1}_q = \mathbf{T}^B_S \mathbf{C}^S_q (\mathbf{T}^B_S)^T
+\end{equation}
+The second term of the equation was related to errors in the calibration mounting pose (point and orientation) of the sensor withe respect to the vehicle. This errors are assumed to follow a Gaussian distribution and the three variables involved are considered to be unrelated between them, so the covariance matrix modelling this calibration error looks like:
+\begin{equation}
+ \mathbf{C}^B_S = 
+ \left[
+ \begin{array}{ccc}
+ \sigma^2_{m_x} & 0 & 0  \\
+ 0 & \sigma^2_{m_y} & 0 \\
+ 0 & 0 & \sigma^2_{\beta} \\
+ \end{array}
+ \right]
+\end{equation}
+where $\sigma_{m_x},\sigma_{m_y}$ and~$\sigma_{\beta}$ are the standard deviations of the mounting pose components~$(m_x,m_y,m_{\beta})$. But in that case, point~$\mathbf{q}^B$ is not linear with respect this new random variable~$(m_x,m_y,m_{\beta})$. The relation was:
+\begin{equation}
+ \mathbf{q}^B =
+ \left[
+ \begin{array}{ccc}
+  \cos\beta & -\sin\beta & m_x \\
+  \sin\beta & \cos\beta & m_y \\
+  0 & 0 & 1
+ \end{array}
+ \right]
+ \left[
+ \begin{array}{c}
+  q^S_x \\
+  q^S_y \\
+  1
+ \end{array}
+ \right]
+ = 
+ \left[
+ \begin{array}{c}
+  q^S_x\cos\beta - q^S_y\sin\beta + m_x \\
+  q^S_x\sin\beta + q^S_y\cos\beta + m_y \\
+  1
+ \end{array}
+ \right]
+\end{equation}
+which is clearly a non-linear relation of~$\mathbf{q}^B$ with respect to the sensor mounting pose $(m_x,m_y,\beta)$, even if it is linear with respect to~$\mathbf{q}^S$ (as it was exploited to compute $\mathbf{C}^{B1}_q$). Thus, we know that to face non-linear relations, we have to linearize, by computing the Jacobian matrix with respect to the non-linear dependencies:
+\begin{equation}
+ \mathbf{J}_{m\beta} = 
+ \left[
+ \begin{array}{ccc}
+ 1 & 0 & -q^S_x\sin\beta - q^S_y\cos\beta  \\
+ 0 & 1 &  q^S_x\cos\beta - q^S_y\sin\beta \\
+ 0 & 0 & 0
+ \end{array}
+ \right]
+\end{equation}
+and now, we are capable to propagate the uncertainty of the calibration errors to the point coordinates in the vehicle frame: 
+\begin{equation}
+ \mathbf{C}^{B2}_q = \mathbf{J}_{m\beta}\mathbf{C}^S_q\mathbf{J}_{m\beta}^T
+\end{equation}
+So the final covariance matrix of the point~$\mathbf{q}$ with respect to the vehicle frame is:
+\begin{equation}
+ \mathbf{C}^{B}_q = \mathbf{C}^{B1}_q + \mathbf{C}^{B2}_q = 
+    \mathbf{T}^B_S \mathbf{C}^S_q (\mathbf{T}^B_S)^T 
+    + 
+    \mathbf{J}_{m\beta}\mathbf{C}^S_q\mathbf{J}_{m\beta}^T
+\end{equation}
+
+The ScuiuLab code below implements all this example and plots the ellispes related to~$\mathbf{C^S_q}$ and~$\mathbf{C^B_q}$.
+\begin{mdframed}
+\tiny
+\begin{verbatim} 
+ //clear
+clear;
+
+//include files (where draw_ellispes_from_cov() function is defined)
+exec("/home/andreu/dev/uncertainty_propagation/ellipsesAxis.sci");
+
+//Sensor point q detection in polar coordinates (r,a) (measurement space)
+r_q = 8;
+a_q = 23*%pi/180; //rad  (20.467)
+qS = [r_q*cos(a_q); r_q*sin(a_q);1]; //point q in homogeneous coordinates wrt to the Sensor
+
+//sensor noise in polar coordinates (measurement space) 
+sigma_range = 0.03; //meters 
+sigma_angle = 0.1*%pi/180; //rad 
+Cra_q = [sigma_range^2 0;0 sigma_angle^2]; //covariance matrix in measurement space
+J_ra = [cos(a_q) -r_q*sin(a_q); sin(a_q) r_q*cos(a_q); 0 0]; //Jacobian: Linearization from measurement to homogeneous space
+
+//Sensor mounting point with respect to the vehicle base
+betaB_S = 35*%pi/180; //orientation angle of the sensor wrt the base
+mB_S = [31;12]; //xy coordinates of the sensor wrt the base
+RB_S = [cos(betaB_S) -sin(betaB_S); sin(betaB_S) cos(betaB_S)]; //rotation of the sensor wrt the base (R base2sensor)
+TB_S = [RB_S mB_S;0 0 1]; //homogeneous transform of the sensor wrt the base (T base2sensor)
+
+//sensor mounting point uncertainty (calibration error, or on-line sensor frame positioning error)
+sigma_mx = 0.005; //meters
+sigma_my = 0.005; //meters
+sigma_beta = 0.1*%pi/180; //rad
+C_mbeta = [sigma_mx^2 0 0; 0 sigma_my^2 0; 0 0 sigma_beta^2];
+J_mbeta = [1 0 -qS(1)*sin(betaB_S)-qS(2)*cos(betaB_S); 0 1 qS(1)*cos(betaB_S)-qS(2)*sin(betaB_S); 0 0 0];
+
+//------------------ PROPAGATE COVARIANCES --------------
+CS_q = J_ra*Cra_q*J_ra'; disp(CS_q);
+CB_q = TB_S*CS_q*TB_S' + J_mbeta*C_mbeta*J_mbeta'; disp(CB_q);
+
+//------------------- DRAW ELLIPSES ---------------------
+figure('BackgroundColor',[1 1 1]);
+drawaxis();
+ph = gca(); // handle
+ph.isoview = 'on';
+ph.axes_visible = ["on","on","off"]
+ph.grid = [1,1];
+ph.auto_scale="on";
+ph.auto_clear = 'off';
+
+//CS_q
+draw_ellispes_from_cov([0 0], CS_q(1:2,1:2),ph);
+e=gce(); // get the current entity (the last created, the ellipses)
+set(e,"foreground",1);
+set(e,"thickness",3);
+ph.auto_clear = 'off';
+
+//CB_q
+draw_ellispes_from_cov([0 0], CB_q(1:2,1:2),ph);
+e=gce(); // get the current entity (the last created, the ellipses)
+set(e,"foreground",2);
+set(e,"thickness",3);
+\end{verbatim}
+\end{mdframed}
+For the values of the code example above, the two plotted ellipses are shown in Figure~\ref{fig:ellipses}. In the black ellispes related to the point uncertainty with respect to the sensor frame,~$\mathbf{C^S_q}$, it can be seen how the shape of the uncertainty is larger in the range measurement component~($r$), rather than in the angular measurement~($\alpha$). The blue ellispes shows the effect of a rotation provoked by the frame transformation ($\mathbf{T}^B_S$), but also the growing due to a new source of uncertainty due to errors on teh calibration mounting pose. 
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/ellipses.eps}
+    \caption{Ellises related to covariance matrixes~$\mathbf{C^S_q}$ (black) and~$\mathbf{C^B_q}$ (blue).}
+    \label{fig:ellipses}
+  \end{center}
+\end{figure}
+
+
+
 
 
