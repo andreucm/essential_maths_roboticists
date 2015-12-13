@@ -230,7 +230,7 @@ In previous subsections we've seen that Gaussian random variables and vectors ha
 
 \paragraph{Example \theexamplecounter. Vehicle frames revisited (with uncertainty)}
 \stepcounter{examplecounter}
-Let's come back to example presented in subsection~\ref{subsec:homogeneous_matrix}. However, now we will focus only in the system vehicle-sensor-point, but we will introduce several uncertainty sources. First of all, the point~$q$ is reported by a sensor in polar coordinates $(q_r,q_{\alpha})$. The datasheet of of that sensor indicates standard deviations for range measurement and azimuth~$\sigma_r$ and~$\sigma_{\alpha}$ respectively. So the covariance matrix of a point~$q$ at the measurement space $(r,\alpha)$ is:
+Let's come back to example presented in subsection~\ref{subsec:homogeneous_matrix}. However, now we will focus only in the system vehicle-sensor-point, but we will introduce several uncertainty sources. First of all, the point~$q$ is reported by a sensor in polar coordinates $(q_r,q_{\alpha})$. The datasheet of that sensor indicates standard deviations for range measurement and azimuth~$\sigma_r$ and~$\sigma_{\alpha}$ respectively. So the covariance matrix of a point~$q$ at the measurement space $(r,\alpha)$ is:
 \begin{equation}
  \mathbf{C}^{r\alpha}_q = 
  \left[
@@ -370,7 +370,7 @@ So the final covariance matrix of the point~$\mathbf{q}$ with respect to the veh
     \mathbf{J}_{m\beta}\mathbf{C}^S_q\mathbf{J}_{m\beta}^T
 \end{equation}
 
-The ScuiuLab code below implements all this example and plots the ellispes related to~$\mathbf{C^S_q}$ and~$\mathbf{C^B_q}$.
+The SciLab code below implements all this example and plots the ellispes related to~$\mathbf{C^S_q}$ and~$\mathbf{C^B_q}$.
 \begin{mdframed}
 \tiny
 \begin{verbatim} 
@@ -436,7 +436,7 @@ For the values of the code example above, the two plotted ellipses are shown in 
 \begin{figure}[bth!]
   \begin{center}
     \includegraphics[width=1.0\columnwidth]{figures/ellipses.eps}
-    \caption{Ellises related to covariance matrixes~$\mathbf{C^S_q}$ (black) and~$\mathbf{C^B_q}$ (blue).}
+    \caption{Ellipses related to covariance matrixes~$\mathbf{C^S_q}$ (black) and~$\mathbf{C^B_q}$ (blue).}
     \label{fig:ellipses}
   \end{center}
 \end{figure}
