@@ -11,6 +11,8 @@
 \usepackage{color, colortbl}
 \usepackage{bm}
 \usepackage{mdframed} %frame text
+\usepackage{algorithmic}
+\usepackage{algorithm}
 
 %page layout: https://en.wikibooks.org/wiki/LaTeX/Page_Layout
 \usepackage{fullpage}
@@ -117,14 +119,23 @@ About how coordinate frames move according their velocities, rotational rates, p
 \subsection{Wheel Kinematics}
 Cases of Wheeled platforms
 
+\subsection{Odometry Integration}
+2D and 3D twist integration
+
 \subsection{Dynamics}
 Coriolis: cases: Feature point, people tracking, ...
 
-\section{Odometry}
-2D and 3D twist integration
+\section{Multi-View Geometry}
+How points and lines change and transform from different projective views, as those taken from a camera.
 
-\section{State Estimation}
-KF, EKF, PF, Optimization, ...
+\section{Kalman Filter}
+\subsection{Kalman Filter (KF)}
+\subsection{Extended Kalman Filter (EKF)}
+\subsection{Error State Extended Kalman Filter (ES-EKF)}
+
+\section{Particle Filter}
+
+\section{Factor Grphs and Windowed Optimization}
 
 
 \bibliographystyle{plain}
