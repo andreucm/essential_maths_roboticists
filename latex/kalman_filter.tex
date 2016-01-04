@@ -1,0 +1,76 @@
+\section{Kalman Filter}
+Kalman Filter can be interpreted as an extension of the recursive least squares seen at subsection~\ref{subsec:recursive_ls}, for those cases where the state of the system we want to estimate changes over the time, so it has a certain known dynamics, so the algorithm can take benefit of this knowledge of the system motion.
+
+This chapter firstly introduces the basic version of the Kalman Filter, and thereafter explains other useful extensions such as the Extended Kalman Filter and the Error State Kalman Filter. The main bibliographic source of inspiration was the book in~\cite{simon06}.
+
+\subsection{Kalman Filter (KF)}
+Given a dynamic system whose states we want to estimate:
+\begin{align}
+\mathbf{x}^t & = \mathbf{F}^t\mathbf{x}^{t-1} + \mathbf{G}^t\mathbf{u}^{t} + \mathbf{n}^t_x \label{eq:dynamic_system_1}\\
+\mathbf{z}^t & = \mathbf{H}^t\mathbf{x}^t + \mathbf{n}^t_z \label{eq:dynamic_system_2}
+\end{align} 
+with 
+\begin{equation}
+ \mathbf{n}^t_x \approx \mathcal{N}(0,\mathbf{C}^t_{n_x}), \ \ \mathbf{n}^t_z \approx \mathcal{N}(0,\mathbf{C}^t_{n_z})
+\end{equation}
+so both the system dynamics (first equation) and measurement model (second equation) are considered random processes, with a certain degree of uncertainty modelled by the two Gaussian variables~$\mathbf{n}^t_x$ and~$\mathbf{n}^t_z$. This uncertainty comes not only from typical noise, but also from unmodelled effects, such as non-linearities not taken into account in such a linear description of the system. 
+
+We define two types of state estimates. The \textit{prior} estimate, also called \textit{prediction}, is the estimate considering measurements up to the last iteration and one step of the dynamic model. It is indicated by underlinning the~$t$ superindex:
+\begin{equation}
+ \hat{\mathbf{x}}^{\underline{t}} = \mathcal{E}\{\mathbf{x}^t\ |\ \mathbf{z}^1,\mathbf{z}^2,\dots \mathbf{z}^{t-1},\}
+\end{equation}
+and the \textit{posterior} estimate, also called \textit{correction}, is the estimate taken into account the current measurement~$\mathbf{z}^{t}$, so the prediction gets corrected by it:
+\begin{equation}
+ \hat{\mathbf{x}}^{t} = \mathcal{E}\{\mathbf{x}^t\ |\ \mathbf{z}^1,\mathbf{z}^2,\dots \mathbf{z}^{t},\}
+\end{equation}
+
+Algorithm~\ref{alg:kalman_filter} summarizes the Kalman Filter, where iterations run over a predicition step and a correction one. 
+\begin{algorithm}
+\caption{Kalman Filter}
+INPUTS: $\hat{\mathbf{x}}^0,\mathbf{C}^0_x,\mathbf{F}^t,\mathbf{G}^t,\mathbf{H}^t$\\
+OUTPUT: $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$, at each iteration
+\begin{algorithmic}
+%\STATE INIT: $\hat{\mathbf{x}}^0,\mathbf{C}^0_x$
+\STATE FOR EACH ITERATION
+\STATE \hspace{0.5cm} PREDICTION
+\STATE \hspace{1cm} $\mathbf{F}^t,\mathbf{G}^t$ //Compute them if they are not constant
+\STATE \hspace{1cm} $\hat{\mathbf{x}}^{\underline{t}} = \mathbf{F}^t\mathbf{x}^{t-1} + \mathbf{G}^t\mathbf{u}^{t}$ //Prior state estimate
+\STATE \hspace{1cm} $\hat{\mathbf{C}}^{\underline{t}}_x = \mathbf{F}^t\hat{\mathbf{C}}^{t-1}_x(\mathbf{F}^t)^T + \mathbf{C}^t_{n_z}$ //Prior state covariance
+\STATE \hspace{0.5cm} CORRECTION
+\STATE \hspace{1cm} $\mathbf{H}^t$ //Compute it if it is not constant
+\STATE \hspace{1cm} $\hat{\mathbf{z}}^t = \mathbf{H}^t\hat{\mathbf{x}}^{\underline{t}}$ //Compute the expected measurement 
+\STATE \hspace{1cm} $\mathbf{K}^t = \mathbf{C}^{\underline{t}}_x(\mathbf{H}^t)^T(\mathbf{H}^t\mathbf{C}^{\underline{t}}_x(\mathbf{H}^t)^T+\mathbf{C}^t_{n_z})^{-1}$ 
+//Compute the gain
+\STATE \hspace{1cm} $\hat{\mathbf{x}}^t = \hat{\mathbf{x}}^{\underline{t}} + \mathbf{K}^t(\mathbf{z}^t - \hat{\mathbf{z}}^t)$ //Posterior state estimate
+\STATE \hspace{1cm} $\mathbf{C}^t_{x} = (\mathbf{I}-\mathbf{K}^t\mathbf{H}^t)\mathbf{C}^{\underline{t}}_x(\mathbf{I}-\mathbf{K}^t\mathbf{H}^t)^T
+		    + \mathbf{K}^t\mathbf{C}^t_{n_z}(\mathbf{K}^t)^T$ //Update the covariance of the state estimate
+\RETURN $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$		    
+\STATE END FOR
+\end{algorithmic}
+\label{alg:kalman_filter}
+\end{algorithm}
+
+In the \textbf{prediction step}, the prior estimate is computed,~$\hat{\mathbf{x}}^{\underline{t}}$, by making a prediction of the state one time-lapse further, thanks to consider the last posterior estimate,~$\hat{\mathbf{x}}^{t-1}$, the known dynamics,~$\mathbf{F}^t$, and possible control inputs to the system,$~\mathbf{G}^t$ and~$\mathbf{u}^t$. In the other hand, the \textbf{correction step} uses the current measurement to improve the prediction, following the same approach used in the recursive least squares (see subsection~\ref{subsec:recursive_ls}), but computing the expected measurement,~$\hat{\mathbf{z}}^t$, at the state point found in the prediction step. 
+
+Depending on the application, this alternate between prediction and correction steps can be modified. For instance, several prediction steps could be computed between two corrections. In multi-sensor cases, some correction steps may involve only a partial subset of measurements, since it is common that not all sensors arrive in the Filter CPU at a same rate. Knowing that the fundamentals of the algorithm are the recursive least squares and the uncertainty propagation, different combinations of prediction and correction steps are completely correct from a theoretical point of view, and can provide practical benefits.
+
+\paragraph{Observabililty Analysis} Observability is the property indicating if a state can be estimated/observed given a system such as presented in equations~\ref{eq:dynamic_system_1} and~\ref{eq:dynamic_system_2}. It os important to check for the observability before starting to code an implementation of the Kalman Filter. The following procedure provides a way to perform this check. Given a system state of~$n$ dimensions, the observability matrix is mounted as:
+\begin{equation}
+\mathbf{Q} = 
+\left[
+ \begin{array}{c}
+  \mathbf{H}\\
+  \mathbf{H}\mathbf{F}\\
+  \mathbf{H}\mathbf{F}^2\\
+  \vdots\\
+  \mathbf{H}\mathbf{F}^{n-1}\\
+ \end{array}
+\right]
+\end{equation}
+The system is observable if and only of the matrix~$\mathbf{Q}$ fulfills $rank(\mathbf{Q})=n$.
+
+
+
+\subsection{Extended Kalman Filter (EKF)}
+
+\subsection{Error State Extended Kalman Filter (ES-EKF)}

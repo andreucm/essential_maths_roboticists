@@ -76,6 +76,7 @@ and solving, the optimal state estimate is finally computed as:
 \end{equation}
 
 \subsection{Recursive Weighted Linear Least Squares (RWL-LS)}
+\label{subsec:recursive_ls}
 The two previous subsections compute the state estimate~$\hat{\mathbf{x}}$ once all the measurements were available. This is usually called \textit{batch} mode, when you solve a problem off-line with all the measurements took into account in one single step. But real robotic estimation processes usually receive measurements one by one, since they usually come from some sensor source or detector process. Solving at each iteration the entire problem from the beginning would produce huge measurement vectors~$\mathbf{z}$ after a while, but even more critical, untreatable covariance matrices~$\mathbf{H}$ and~$\mathbf{C}_{n_z}$ to be inverted. So it is important to find a recursive approach to solve a linear least squares in such context. 
 
 At a given iteration~$t$, we continue to assume a linear measurement model, which \textit{may} change at each iteration, as it is indicated with the~${}^t$ superindex: 
