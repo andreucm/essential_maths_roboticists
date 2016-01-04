@@ -136,15 +136,20 @@ OUTPUT: $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$, at each iteration
 \paragraph{Example \theexamplecounter. Estimate a constant velocity from wheel encoders.}
 \stepcounter{examplecounter}
 This example assumes a 4-wheeled vehicle running at constant forward velocity~$v$ and rotational rate~$\omega$ on a plane.
-The main step we have to solve is to find the measurement model, which relates the state~$\mathbf{x}=[v\ \omega]$ with the measurements can obtain from the system. 
+We want to estimate these two variables, from the measurements we get from each wheel encoder. So, the main step we have to solve is to find the measurement model, which relates the state~$\mathbf{x}=[v\ \omega]$ with these measurements.
+\begin{figure}[h!]
+  \includegraphics[width=1\linewidth]{figures/wheel-4diff_kinematics.eps}
+  \caption{Differential 4-wheel kinematics: from wheel rotational rates to vehicle linear and rotational velocities~$v,\omega$.}
+  \label{fig:wheel-4diff_kinematics}
+\end{figure}
 
-The measurements we have are the four linear velocities provided by the four encoders mounted at each wheel axis. These linear velocities are directly the rotational velocities reported by each encoder multiplied by the wheel radius:
+The measurements we have are the four linear velocities provided by the four encoders mounted at each wheel axis (see figure~\ref{fig:wheel-4diff_kinematics}). These linear velocities are directly the rotational velocities,~$\omega_w$ reported by each encoder multiplied by the wheel radius,~$r_w$:
 \begin{equation}
 v_{lf} = \omega_{lf}r_{lf};\ v_{lb} = \omega_{lb}r_{lb};\ v_{rf} = \omega_{rf}r_{rf};\ v_{rb} = \omega_{rb}r_{rb}
 \end{equation}
-where $\omega_{**}$, $v_{**}$ and~$r_{**}$ are rotational and linear speeds and radius for each wheel (left/right front/back). We consider the radius of the wheels to be precisely known, so the only random variable is each rotational speed measurement, which leads to random variables at linear speed for each wheel. 
+where $\omega_{**}$, $v_{**}$ and~$r_{**}$ are rotational and linear speeds and radius for each wheel (left/right front/back). We consider the radius of the wheels to be precisely known,~$r_w$, so the only random variable is each rotational speed measurement, which leads to random variables at linear speed for each wheel. 
 
-From the kinematics of a 4-wheeled platform, we have the following two equations, for left and right velocities, according to the rotational rate of the vehicle. These equations relate the arc run by the robot, for the left-wheels and for the right ones, during a $\Delta\tau$ time step:
+From the kinematics of a 4-wheeled platform (Figure~\ref{fig:wheel-4diff_kinematics}), we have the following two equations, for left and right velocities, according to the rotational rate of the vehicle. These equations relate the arc run by the robot, for the left-wheels and for the right ones, during a $\Delta\tau$ time step:
 \begin{equation}
 \begin{array}{cc}
  v_l\Delta\tau = & \omega\Delta\tau(r_c+\frac{b}{2}) \\
@@ -152,7 +157,7 @@ From the kinematics of a 4-wheeled platform, we have the following two equations
 \end{array}
 \label{eq:v_l_v_r}
 \end{equation}
-and curvature radius of the vehicle's trajectory,~$r_c$, is provided by the relation~$v=\omega r_c$. Rearranging terms, we finish with the following two equations whcih explain measurements~$v_{l*},v_{r*}$ as a function of the system state~$\mathbf{x}=[v\ \omega]^T$
+where the curvature radius of the vehicle's trajectory,~$r_p$, is provided by the relation~$v=\omega r_p$. Rearranging terms, we finish with the following two equations which explain measurements~$v_{l*},v_{r*}$ as a function of the system state~$\mathbf{x}=[v\ \omega]^T$
 \begin{equation}
 \begin{array}{cc}
  v_{l*} = v+\omega\frac{b}{2} \\
@@ -219,7 +224,7 @@ which comes from adding and substracting the two equations in~\ref{eq:v_l_v_r}. 
 \end{equation}
 which indicates $\sqrt{1}m/s$ in linear standard deviation and $\sqrt{0.2}rad/s$ in rotational rate standard deviation. 
 
-If we don't have actual measurements from a set of encoders, to simulate the measurement set is required to generate a syntethically them, taking into account similar stathistics. This is performed at the first lins of the SciLab code below.  The code continues initiliazing the matrices involves, and then it goes to the main loop that solves iteratively the least squares estimate for~$v$ and~$\omega$.
+If we don't have actual measurements from a set of encoders, to simulate the measurement set is required to generate them syntethically, taking into account some stathistics. This is performed at the first lines of the SciLab code below.  The code continues initiliazing the involved matrixes, and then it goes to the main loop that solves iteratively the least squares estimate for~$v$ and~$\omega$.
 \begin{mdframed}
 \tiny
 \begin{verbatim} 
@@ -316,7 +321,7 @@ Figure~\ref{fig:vw_plot_rw-ls} shows the evolution of each component of the stat
   \hspace{0mm}
   \includegraphics[width=0.32\linewidth]{figures/trCx_rw-ls.eps}
   \hspace{0mm}
-  \caption{Evolution of linear (left) and rotational (center) speeds, and trace of covariance matrix (right), while the algrithm iterates.}
+  \caption{Evolution of linear (left) and rotational (center) speeds, and trace of covariance matrix (right), while the algorithm iterates.}
   \label{fig:vw_plot_rw-ls}
 \end{figure}
 
