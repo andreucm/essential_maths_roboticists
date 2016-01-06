@@ -35,7 +35,7 @@ OUTPUT: $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$, at each iteration
 \STATE \hspace{0.5cm} PREDICTION
 \STATE \hspace{1cm} $\mathbf{F}^t,\mathbf{G}^t$ //Compute them if they are not constant
 \STATE \hspace{1cm} $\hat{\mathbf{x}}^{\underline{t}} = \mathbf{F}^t\mathbf{x}^{t-1} + \mathbf{G}^t\mathbf{u}^{t}$ //Prior state estimate
-\STATE \hspace{1cm} $\hat{\mathbf{C}}^{\underline{t}}_x = \mathbf{F}^t\hat{\mathbf{C}}^{t-1}_x(\mathbf{F}^t)^T + \mathbf{C}^t_{n_z}$ //Prior state covariance
+\STATE \hspace{1cm} $\mathbf{C}^{\underline{t}}_x = \mathbf{F}^t\mathbf{C}^{t-1}_x(\mathbf{F}^t)^T + \mathbf{C}^t_{n_z}$ //Prior state covariance
 \STATE \hspace{0.5cm} CORRECTION
 \STATE \hspace{1cm} $\mathbf{H}^t$ //Compute it if it is not constant
 \STATE \hspace{1cm} $\hat{\mathbf{z}}^t = \mathbf{H}^t\hat{\mathbf{x}}^{\underline{t}}$ //Compute the expected measurement 
@@ -54,7 +54,7 @@ In the \textbf{prediction step}, the prior estimate is computed,~$\hat{\mathbf{x
 
 Depending on the application, this alternate between prediction and correction steps can be modified. For instance, several prediction steps could be computed between two corrections. In multi-sensor cases, some correction steps may involve only a partial subset of measurements, since it is common that not all sensors arrive in the Filter CPU at a same rate. Knowing that the fundamentals of the algorithm are the recursive least squares and the uncertainty propagation, different combinations of prediction and correction steps are completely correct from a theoretical point of view, and can provide practical benefits.
 
-\paragraph{Observabililty Analysis} Observability is the property indicating if a state can be estimated/observed given a system such as presented in equations~\ref{eq:dynamic_system_1} and~\ref{eq:dynamic_system_2}. It os important to check for the observability before starting to code an implementation of the Kalman Filter. The following procedure provides a way to perform this check. Given a system state of~$n$ dimensions, the observability matrix is mounted as:
+\paragraph{Observabililty Analysis} Observability is a property of a linear system, such as the one defined in equations~\ref{eq:dynamic_system_1} and~\ref{eq:dynamic_system_2}, that indicates if a state can be estimated/observed. It is important to check for the observability before starting to code an implementation of the Kalman Filter. The following procedure provides a way to perform this check. Given a system state of~$n$ dimensions, the observability matrix is mounted as:
 \begin{equation}
 \mathbf{Q} = 
 \left[
@@ -67,8 +67,116 @@ Depending on the application, this alternate between prediction and correction s
  \end{array}
 \right]
 \end{equation}
-The system is observable if and only of the matrix~$\mathbf{Q}$ fulfills $rank(\mathbf{Q})=n$.
+The system is observable if and only of the matrix~$\mathbf{Q}$ fulfills $rank(\mathbf{Q})=n$. Observability is the concept allowing us to estimate states that we do not directly measure, we just \textit{observe}.
 
+\paragraph{Example \theexamplecounter. Object tracking in an image.}
+\stepcounter{examplecounter}
+Object detectors, such as ball or face detectors, typically provide pixel coordinate of the center of the target object at a given rate. However, they usually have false positive and false negative events, the first report detections when no target is present, the later not providing detections when the target is present in the scene. Therefore, it is always interesting to combine the output of a detector with a tracker, since the output of a tracking process provides smoother and more robust values of the object's position in the image.
+
+Given a detector providing detections as object positions in image pixel coordinates, we consider, at iteration~$t$, this detection as the mesaurement:
+\begin{equation}
+ \mathbf{z}^t = [z^t_x\ \ z^t_y]^T \ ,
+\end{equation}
+and we define the state as:
+\begin{equation}
+ \mathbf{x}^t = [p^t_x\ \ p^t_y\ \ v^t_x\ \ v^t_y]^T.
+\end{equation}
+which are the position and the velocity of the object in pixel coordinates. Adding velocities to the state is useful in order to benefit from a dynamic model, even if it is simple, since Kalman filtering allows to exploit this knowledge through prior calculation. So the simple dynamic model we will consider is the following:
+\begin{equation}
+ \mathbf{x}^t = \mathbf{F}\mathbf{x}^{t-1} + \mathbf{n}^t_{x}; \ \ \ \
+\mathbf{F}^t = \mathbf{F} = 
+\left[
+ \begin{array}{cccc}
+  1 & 0 & \Delta\tau & 0 \\
+  0 & 1 & 0 & \Delta\tau \\
+  0 & 0 & 1 & 0 \\
+  0 & 0 & 0 & 1 \\
+ \end{array}
+ \right]; \ \ 
+ \mathbf{C}^t_{n_x} = \mathbf{C}_{n_x} = 
+\left[
+ \begin{array}{cccc}
+  1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 \\
+  0 & 0 & 25 & 0 \\
+  0 & 0 & 0 & 25 \\
+ \end{array}
+ \right]; \ \ 
+\end{equation}
+where~$\Delta\tau$ is the time lapse between two iterations in seconds. This dynamic model do not consider control inputs ($\mathbf{u}^t$ in equation~\ref{eq:dynamic_system_1}) since the object is considered to move free, without any control from our system. The uncertainty associated to this dynamic model is characterized as a Gaussian noise, with a covariance matrix set from experimental experience, so it considers 1 pixel of standard deviation in position, 5 pixels of standard deviation in velocity and null covariance terms. Both matrixes~$\mathbf{F}$ and~$\mathbf{C}_{n_x}$ are considered constant, so the iteration superindex~$t$ has been removed. This dynamic model is called \textit{constant velocity} model, since assumes that the objects move thorugh the scene at a constant (linear) velocity. This may not be true, so uncertainty matrix has to be enough large to incorporate these model inaccuracies. This simple motion model may cause poor results, specially if time lapse~$\Delta\tau$ is large in comparison with the target speed, but increasing filter rate can mitigate this limitations leading to a better output.
+
+The mesaurement model, which allows to compute the expected measurement from the state is:
+\begin{equation}
+ \mathbf{z}^t = \mathbf{H}\mathbf{x}^{t} + \mathbf{n}^t_{z}; \ \ \ \
+\mathbf{H}^t = \mathbf{H} = 
+\left[
+ \begin{array}{cccc}
+  1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 \\
+ \end{array}
+ \right]; \ \ 
+ \mathbf{C}^t_{n_z} = \mathbf{C}_{n_z} = 
+\left[
+ \begin{array}{cc}
+  25 & 0 \\
+  0 & 25 \\
+ \end{array}
+ \right]; \ \ 
+\end{equation}
+which is also a constant-time model, and just expects that the measurement is equal to the pixel position components of the state. The velocity part is not measured, so the matrix~$\mathbf{H}$ has only two rows. And the velocity part of the state do not contribute to the measurement, so the zeros in the third and fourth columns of~$\mathbf{H}$. Again, a 5 pixels standard deviation is considered to model the innacuracies of the detector. 
+
+At this point we summarize the dimensions of the filter. The state space is 4-dimensional ($n=4$), while the measurement space is 2-dimensional ($m=2$). Let's check if this design pass the observability test:
+\begin{equation}
+ \mathbf{Q} = 
+ \left[
+ \begin{array}{cccc}
+  1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 \\
+  1 & 0 & \Delta\tau & 0 \\
+  0 & 1 & 0 & \Delta\tau \\
+  \vdots  
+ \end{array}
+\right]
+\longrightarrow rank(\mathbf{Q})=4, 
+\end{equation}
+so the state is observable. 
+
+To start running the filter, we only need to decide how to initialize it. In tracking applications, it is common to initialize the state with the values provided by a first detection, for the pixel position, and null values for the pixel velocities. The state covariance, could be initialized as:
+\begin{equation}
+ \mathbf{C}^0_x = 
+ \left[
+ \begin{array}{cccc}
+  25 & 1 & 0 & 0 \\
+  1 & 25 & 0 & 0 \\
+  0 & 0 & 100 & 1 \\
+  0 & 0 & 1 & 100 \\
+ \end{array}
+ \right]
+\end{equation}
+
+Algorithm~\ref{alg:object_tracking_kf} summarizes the object tracking implementation with the Kalman Filter.
+\begin{algorithm}
+\caption{Kalman Filter}
+\begin{algorithmic}
+\STATE $\hat{\mathbf{x}}^0 \leftarrow\ [z^0_x\ z^0_y\ 0\ 0]^T$ //init state with first detection
+\STATE$\mathbf{C}^0_x$ //init state covariance with fixed values 
+\STATE FOR EACH ITERATION
+\STATE \hspace{0.5cm} PREDICTION
+\STATE \hspace{1cm} $\hat{\mathbf{x}}^{\underline{t}} = \mathbf{F}\mathbf{x}^{t-1}$ //Prior state estimate
+\STATE \hspace{1cm} $\mathbf{C}^{\underline{t}}_x = \mathbf{F}\mathbf{C}^{t-1}_x\mathbf{F}^T + \mathbf{C}_{n_z}$ //Prior state covariance
+\STATE \hspace{0.5cm} CORRECTION
+\STATE \hspace{1cm} $\hat{\mathbf{z}}^t = \mathbf{H}\hat{\mathbf{x}}^{\underline{t}}$ //Compute the expected measurement 
+\STATE \hspace{1cm} $\mathbf{K}^t = \mathbf{C}^{\underline{t}}_x\mathbf{H}^T(\mathbf{H}\mathbf{C}^{\underline{t}}_x\mathbf{H}^T+\mathbf{C}_{n_z}^{-1}$ 
+//Compute the gain
+\STATE \hspace{1cm} $\hat{\mathbf{x}}^t = \hat{\mathbf{x}}^{\underline{t}} + \mathbf{K}^t(\mathbf{z}^t - \hat{\mathbf{z}}^t)$ //Posterior state estimate
+\STATE \hspace{1cm} $\mathbf{C}^t_{x} = (\mathbf{I}-\mathbf{K}^t\mathbf{H})\mathbf{C}^{\underline{t}}_x(\mathbf{I}-\mathbf{K}^t\mathbf{H})^T
+		    + \mathbf{K}^t\mathbf{C}_{n_z}(\mathbf{K}^t)^T$ //Update the covariance of the state estimate
+\STATE \hspace{1cm} $\mathbf{C}^t_{x} \leftarrow \frac{1}{2}(\mathbf{C}^t_{x}+(\mathbf{C}^t_{x})^T)$ //ensures covariance is definite positive
+\RETURN $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$		    
+\STATE END FOR
+\end{algorithmic}
+\label{alg:object_tracking_kf}
+\end{algorithm}
 
 
 \subsection{Extended Kalman Filter (EKF)}
