@@ -2,7 +2,7 @@
 clear;
 
 //include files (where draw_ellispes_from_cov() function is defined)
-exec("/home/andreu/dev/uncertainty_propagation/ellipsesAxis.sci");
+exec("/home/andreu/reporting/notes/essential_maths_roboticists/scilab/ellipsesAxis.sci");
 
 //Sensor point q detection in polar coordinates (r,a) (measurement space)
 r_q = 8;
@@ -10,7 +10,7 @@ a_q = 23*%pi/180; //rad  (20.467)
 qS = [r_q*cos(a_q); r_q*sin(a_q);1]; //point q in homogeneous coordinates wrt to the Sensor
 
 //sensor noise in polar coordinates (measurement space) 
-sigma_range = 0.03; //meters 
+sigma_range = 0.01; //meters 
 sigma_angle = 0.1*%pi/180; //rad 
 Cra_q = [sigma_range^2 0;0 sigma_angle^2]; //covariance matrix in measurement space
 J_ra = [cos(a_q) -r_q*sin(a_q); sin(a_q) r_q*cos(a_q); 0 0]; //Jacobian: Linearization from measurement to homogeneous space
@@ -22,9 +22,9 @@ RB_S = [cos(betaB_S) -sin(betaB_S); sin(betaB_S) cos(betaB_S)]; //rotation of th
 TB_S = [RB_S mB_S;0 0 1]; //homogeneous transform of the sensor wrt the base (T base2sensor)
 
 //sensor mounting point uncertainty (calibration error, or on-line sensor frame positioning error)
-sigma_mx = 0.005; //meters
-sigma_my = 0.005; //meters
-sigma_beta = 0.1*%pi/180; //rad
+sigma_mx = 0.02; //meters
+sigma_my = 0.02; //meters
+sigma_beta = 0.2*%pi/180; //rad
 C_mbeta = [sigma_mx^2 0 0; 0 sigma_my^2 0; 0 0 sigma_beta^2];
 J_mbeta = [1 0 -qS(1)*sin(betaB_S)-qS(2)*cos(betaB_S); 0 1 qS(1)*cos(betaB_S)-qS(2)*sin(betaB_S); 0 0 0];
 

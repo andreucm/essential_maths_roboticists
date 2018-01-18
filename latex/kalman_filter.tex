@@ -35,7 +35,7 @@ OUTPUT: $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$, at each iteration
 \STATE \hspace{0.5cm} PREDICTION
 \STATE \hspace{1cm} $\mathbf{F}^t,\mathbf{G}^t$ //Compute them if they are not constant
 \STATE \hspace{1cm} $\hat{\mathbf{x}}^{\underline{t}} = \mathbf{F}^t\mathbf{x}^{t-1} + \mathbf{G}^t\mathbf{u}^{t}$ //Prior state estimate
-\STATE \hspace{1cm} $\mathbf{C}^{\underline{t}}_x = \mathbf{F}^t\mathbf{C}^{t-1}_x(\mathbf{F}^t)^T + \mathbf{C}^t_{n_z}$ //Prior state covariance
+\STATE \hspace{1cm} $\mathbf{C}^{\underline{t}}_x = \mathbf{F}^t\mathbf{C}^{t-1}_x(\mathbf{F}^t)^T + \mathbf{C}^t_{n_x}$ //Prior state covariance
 \STATE \hspace{0.5cm} CORRECTION
 \STATE \hspace{1cm} $\mathbf{H}^t$ //Compute it if it is not constant
 \STATE \hspace{1cm} $\hat{\mathbf{z}}^t = \mathbf{H}^t\hat{\mathbf{x}}^{\underline{t}}$ //Compute the expected measurement 
@@ -156,17 +156,17 @@ To start running the filter, we only need to decide how to initialize it. In tra
 
 Algorithm~\ref{alg:object_tracking_kf} summarizes the object tracking implementation with the Kalman Filter.
 \begin{algorithm}
-\caption{Kalman Filter}
+\caption{Kalman Filter for Object Tracking}
 \begin{algorithmic}
 \STATE $\hat{\mathbf{x}}^0 \leftarrow\ [z^0_x\ z^0_y\ 0\ 0]^T$ //init state with first detection
 \STATE$\mathbf{C}^0_x$ //init state covariance with fixed values 
 \STATE FOR EACH ITERATION
 \STATE \hspace{0.5cm} PREDICTION
 \STATE \hspace{1cm} $\hat{\mathbf{x}}^{\underline{t}} = \mathbf{F}\mathbf{x}^{t-1}$ //Prior state estimate
-\STATE \hspace{1cm} $\mathbf{C}^{\underline{t}}_x = \mathbf{F}\mathbf{C}^{t-1}_x\mathbf{F}^T + \mathbf{C}_{n_z}$ //Prior state covariance
+\STATE \hspace{1cm} $\mathbf{C}^{\underline{t}}_x = \mathbf{F}\mathbf{C}^{t-1}_x\mathbf{F}^T + \mathbf{C}_{n_x}$ //Prior state covariance
 \STATE \hspace{0.5cm} CORRECTION
 \STATE \hspace{1cm} $\hat{\mathbf{z}}^t = \mathbf{H}\hat{\mathbf{x}}^{\underline{t}}$ //Compute the expected measurement 
-\STATE \hspace{1cm} $\mathbf{K}^t = \mathbf{C}^{\underline{t}}_x\mathbf{H}^T(\mathbf{H}\mathbf{C}^{\underline{t}}_x\mathbf{H}^T+\mathbf{C}_{n_z}^{-1}$ 
+\STATE \hspace{1cm} $\mathbf{K}^t = \mathbf{C}^{\underline{t}}_x\mathbf{H}^T(\mathbf{H}\mathbf{C}^{\underline{t}}_x\mathbf{H}^T+\mathbf{C}_{n_z})^{-1}$ 
 //Compute the gain
 \STATE \hspace{1cm} $\hat{\mathbf{x}}^t = \hat{\mathbf{x}}^{\underline{t}} + \mathbf{K}^t(\mathbf{z}^t - \hat{\mathbf{z}}^t)$ //Posterior state estimate
 \STATE \hspace{1cm} $\mathbf{C}^t_{x} = (\mathbf{I}-\mathbf{K}^t\mathbf{H})\mathbf{C}^{\underline{t}}_x(\mathbf{I}-\mathbf{K}^t\mathbf{H})^T

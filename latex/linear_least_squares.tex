@@ -158,7 +158,7 @@ From the kinematics of a 4-wheeled platform (Figure~\ref{fig:wheel-4diff_kinemat
 \end{array}
 \label{eq:v_l_v_r}
 \end{equation}
-where the curvature radius of the vehicle's trajectory,~$r_p$, is provided by the relation~$v=\omega r_p$. Rearranging terms, we finish with the following two equations which explain measurements~$v_{l*},v_{r*}$ as a function of the system state~$\mathbf{x}=[v\ \omega]^T$
+where the curvature radius of the vehicle's trajectory,~$r_c$, is provided by the relation~$v=\omega r_c$. Rearranging terms, we finish with the following two equations which explain measurements~$v_{l*},v_{r*}$ as a function of the system state~$\mathbf{x}=[v\ \omega]^T$
 \begin{equation}
 \begin{array}{cc}
  v_{l*} = v+\omega\frac{b}{2} \\
@@ -198,7 +198,7 @@ where each term of the above equation is:
  \right]^t;\ 
  \mathbf{n}^t_z \sim \mathcal{N}(\mathbf{0},\mathbf{C}_{n_z})
 \end{equation}
-At this point, we need to model the measurement noise, by setting the coefficients of the~$\mathbf{C}_{n_z}$ matrix according of data and knowledge we may have coming from the device datasheets and/or the measurement procedures (misscalibrations, missynchronizations, noise, unmodelled vehicle slippages, ... ). To illustrate better the effect of different uncertainty levels on measurement, the example propose to consider that the front encoders are cheaper than the back ones. With all this in mind, we consider~$\sigma_{.f}=5cm/s$ and~$\sigma_{.b}=1cm/s$, and we set covariance terms to $0.5^2 cm^2/s$, so the final measurement covariance matrix is (constant in time):
+At this point, we need to model the measurement noise, by setting the coefficients of the~$\mathbf{C}_{n_z}$ matrix according of data and knowledge we may have coming from the device datasheets and/or the measurement procedures (misscalibrations, missynchronizations, noise, unmodelled vehicle slippages, ... ). To illustrate better the effect of different uncertainty levels on measurement, the example propose to consider that the front encoders are cheaper than the back ones. With all this in mind, we consider~$\sigma_{.f}=5cm/s^2$ and~$\sigma_{.b}=1cm/s$, and we set covariance terms to $0.5^2 cm^2/s$, so the final measurement covariance matrix is (constant in time):
 \begin{equation}
  \mathbf{C}_{n_z} = 
  \left[
@@ -212,8 +212,13 @@ At this point, we need to model the measurement noise, by setting the coefficien
 \end{equation}
 
 Finally, we need the initial guess for the state estimate and state covariance. The initial guess for the state can be set by some knowledge about the system, or may be by collecting a short initial subset of measurements, computing the mean of them and solving the expression:
-
-which comes from adding and substracting the two equations in~\ref{eq:v_l_v_r}. Fo state covariance matrix, the initial geuss have to be enough \textit{noisy} to allow the algorithm to take effect from measurements appropiately, so it could be set to: 
+\begin{equation}
+\begin{array}{cc}
+ v = \frac{v_r+v_l}{2} \\
+ \omega = \frac{v_l-v_r}{b}
+\end{array}
+\end{equation}
+which comes from adding and substracting the two equations in~\ref{eq:v_l_v_r}. Fo state covariance matrix, the initial guess have to be enough \textit{noisy} to allow the algorithm to take effect from measurements appropiately, so it could be set to: 
 \begin{equation}
  \mathbf{C}^0_{x} = 
  \left[

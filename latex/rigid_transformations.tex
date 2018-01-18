@@ -9,6 +9,7 @@ Coordinate frames will be written as $\mathcal{F}^A,\ \mathcal{F}^B$, for frames
 There are several ways to represent a rotation. The most used ones are the following: rotation matrix, quaternion, Euler angles and axis angle. Each representation has benefits and drawbacks, depending on the application. For instance, for a sea ship which will never flip (hopefully), Euler angles could be a good option, but for an end effector tool expected to cover all orientations in 3D, quaternions or Rotation matrix could be better. 
 
 \subsubsection{Rotation Matrix}
+\label{subsec:rotation_matrix}
 \paragraph{Definition} A rotation matrix~$\mathbf{R}$ is a squared, orthogonal matrix with $|\mathbf{R}|=1$. 
 
 \paragraph{Interpretation} Columns of $\mathbf{R}$ can be interpreted as orthonormal vectors expressing a frame~$\mathcal{F}^B$ in terms of another frame~$\mathcal{F}^A$. In that case, such rotation matrix is expressed as~$\mathbf{R}^A_B$. Given two frames which are rotated, $\mathcal{F}^A$ and~$\mathcal{F}^B$, and given a vector~$\mathbf{v}^B$ expressed in terms of~$\mathcal{F}^B$, the following equation expresses the vector~$\mathbf{v}$ with its new coordinates in terms of~$\mathcal{F}^A$:
@@ -274,7 +275,7 @@ The homogeneous matrix representing the frame~$B$ in terms of the frame~$A$ (bot
  \end{array}
 \right]
 \end{equation}
-Then, as it was described by pure rotation case in subsectionXX, it fulfills that:
+Then, as it was described by pure rotation case in subsection~\ref{subsec:rotation_matrix}, it fulfills that:
 \begin{equation}
 \left[
  \begin{array}{c}
@@ -318,7 +319,13 @@ Homogeneous matrixes also allow chaining as rotations do:
   1
  \end{array}
  \right]
- = \mathbf{T}^A_C \mathbf{v}^C
+ = \mathbf{T}^A_C 
+  \left[
+ \begin{array}{c}
+  \mathbf{v}^C \\
+  1
+ \end{array}
+ \right].
 \end{equation}
 
 \paragraph{Example \theexamplecounter. Vehicle frames.}
