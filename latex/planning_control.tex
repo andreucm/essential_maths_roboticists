@@ -1,0 +1,48 @@
+\section{Planning and control}
+How to plan paths and trajectories at actuator or platform level, and how to control the robot to execute them. 
+
+\subsection{Spline planning in 1D}
+Cubic splines in 1D are curves in the $t$ parameter that fulfill zero-order and first-order derivative constraints, so they allow to interpolate between two points in a soft way.
+
+Compute the cubic polynomial in $t\in[0,1]$ domain:
+\begin{equation}
+ x(t) = at^3 + bt^2 + ct + d
+\end{equation}
+with the following four constraints: 
+\begin{align}
+ x(0) = & x_0 \\
+ x(1) = & x_1 \\
+ \dot{x}(0) = & \tau_0 \\
+ \dot{x}(1) = & \tau_1 \\
+\end{align}
+Given that: 
+\begin{equation}
+ \dot{x}(t) = 3at^2 + 2bt + c
+\end{equation}
+the system of equations to solve is: 
+\begin{align}
+ d = & x_0 \\ \label{eq:system_spline_1d_1}
+ a+b+c+d = & x_1 \\ \label{eq:system_spline_1d_2}
+ c = & \tau_0 \\ \label{eq:system_spline_1d_3}
+ 3a+2b+c = & \tau_1 \\ \label{eq:system_spline_1d_4}
+\end{align}
+Substracting 3 times the equation~\ref{eq:system_spline_1d_2} to the equation~~\ref{eq:system_spline_1d_4}, we obtain: 
+\begin{equation}
+ -b -2c -3d = \tau_1-3x_1; b=3(x_1-x_0) - 2\tau_0 - \tau_1
+\end{equation}
+
+
+
+
+
+
+
+\subsection{Spline planning in 2D}
+
+\subsection{A* for Global Planning}
+
+\subsection{PID control}
+
+\subsection{Trajectory control}
+
+\subsection{Dynamical Window Approach (DWA) for wheeled robots}
