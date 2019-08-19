@@ -68,6 +68,52 @@ x(t) = \left[
 
 \subsection{PID control}
 
+The diagram in figure~\ref{fig:xx} shows the standard situation for a PID controller. 
+
+Given a desired, reference or set-point signal~$s^t$, a control command~$u^t$, a process state~$x^t$ and a process state estimate~$\hat{x}^t$ issued from a sensing/perception stage, the error signal is defined as: 
+\begin{align}
+ & e^t = s^t - \hat{x}^t \\
+ & \dot{e}^t = \frac{e^t-e^{t-1}}{\Delta T} \\
+ & \bar{e}^t = \sum^N_{j=0} e^{t-j}\Delta T \\
+\end{align}
+and the output control command is then computed as: 
+\begin{equation}
+ u^t  = K_p e^t \ + \ K_i \bar{e}^t \ + \ K_d \dot{e}^t
+\end{equation}
+
+Algorithm~\ref{alg:pid_controller} summarizes the PID controller using pseudocode related to STL C++ vectors.  
+\begin{algorithm}
+\caption{PID controller}
+\begin{algorithmic}
+\STATE WHILE (true)
+\STATE \hspace{0.5cm} $s=getSetPoint()$
+\STATE \hspace{0.5cm} $x=getSensing()$
+\STATE \hspace{0.5cm} $e = s-x$
+\STATE \hspace{0.5cm} $ed = (e-ev.back())/\Delta T$
+\STATE \hspace{0.5cm} $ev.push\_back(e) = (e-ev.back())/\Delta T$
+\STATE \hspace{0.5cm} IF $ev.size()>N$
+\STATE \hspace{1cm} $ei = ei+e\Delta T-ev.front()\Delta T $
+\STATE \hspace{1cm} $ev.pop\_front()$
+\STATE \hspace{0.5cm} ELSE
+\STATE \hspace{1cm} $ei = ei+e\Delta T$
+\STATE \hspace{0.5cm} END IF
+\STATE \hspace{0.5cm} $u = K_p e + K_i ei + K_d ed$
+\STATE END WHILE
+\end{algorithmic}
+\label{alg:pid_controller}
+\end{algorithm}
+
+The main difficulty of the PID in practical situations is to correctly tune the constants~$K_p, K_i$ and~$K_d$. The general guidelines for this tunning are, in order: 
+\begin{enumerate}
+	\item $K_p = K_i = K_d = 0$
+	\item Increase $K_p$ up to get some reasonable result.
+	\item Reduce the overshoot effect by increasing $K_d$.
+	\item Last fine tunning by increasing $K_i$.
+\end{enumerate}
+
+The main interpretation of this PID controller is that proportional part is the one mainly driving the control, but the derivative part allows the controller to incorporate some predictive behavior. Finnally the integral contribution gives the possibilty to accurately reach a control reference when the proportional part is near zero.
+
+
 \subsection{Trajectory control}
 
 \subsection{Dynamical Window Approach (DWA) for wheeled robots}
