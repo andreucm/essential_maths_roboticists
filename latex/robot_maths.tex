@@ -48,7 +48,7 @@ This document is a running collection of math notes. They try to summarize in a 
 \tableofcontents
 
 \newpage
-\section{Notation}
+\section*{Notation}
 Main conventions and notation used through the document are listed below:
 
 $a,b,c,x,y,z,u,v,w,...$ are scalars.
@@ -90,6 +90,9 @@ $\mathbf{q} = (q_r,q_x,q_y,q_z) = (a,b,c,d)$ is a quaternion. $q_r$ or~$a$ are t
 $\hat{\mathbf{x}}$ is an estimate of $\mathbf{x}$, which is an actual (unknown) quantity.
 
 \newpage
+\part{Math essentials}
+
+\newpage
 \input{basic_trigonometry.tex}
 
 \newpage
@@ -111,28 +114,27 @@ $\hat{\mathbf{x}}$ is an estimate of $\mathbf{x}$, which is an actual (unknown) 
 \input{random_variables.tex}
 
 \newpage
-\input{linear_least_squares.tex}
+\part{Kinematics}
 
 \newpage
-\section{Kinematics and Dynamics}
-About how coordinate frames move according their geometry, velocities, rotational rates, positions and orientations. 
+\input{wheeled_vehicle_kinematics.tex}
 
-\subsection{Wheeled Vehicle Kinematics}
-Cases of Wheeled platforms
+\newpage
+\section{Odometry}
+Odometry role, sources and 2D/3D twist integration
 
-\subsection{Odometry Integration}
-2D and 3D twist integration
-
-\subsection{Dynamics}
-Coriolis: cases: Feature point, people tracking, ...
+\newpage
+\part{Planning and Control}
 
 \newpage
 \input{planning_control.tex}
 
+\newpage
+\part{Estimation}
 
 \newpage
-\section{Multi-View Geometry in Computer Vision}
-How points and lines change and transform from different projective views, as those taken from a camera.
+\input{linear_least_squares.tex}
+
 
 \newpage
 \input{kalman_filter.tex}
@@ -145,6 +147,12 @@ To do
 \section{Factor Graphs and Windowed Optimization}
 To do
 
+\newpage
+\section{Multi-View Geometry in Computer Vision}
+How points and lines change and transform from different projective views, as those taken from a camera.
+
+\newpage
+\part{Implementation Tools}
 \newpage
 \section{Common Algorithms}
 RANSAC, ICP, HOUGH Transform, K-means clustering
