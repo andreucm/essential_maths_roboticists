@@ -68,7 +68,16 @@ x(t) = \left[
 
 \subsection{PID control}
 
-The diagram in figure~\ref{fig:xx} shows the standard situation for a PID controller. 
+The diagram in figure~\ref{fig:pid} shows the standard situation for a PID controller. 
+
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/pid.png}
+    \caption{General diagram for a PID controller.}
+    \label{fig:pid}
+  \end{center}
+\end{figure}
+
 
 Given a desired, reference or set-point signal~$s^t$, a control command~$u^t$, a process state~$x^t$ and a process state estimate~$\hat{x}^t$ issued from a sensing/perception stage, the error signal is defined as: 
 \begin{align}
