@@ -1,16 +1,150 @@
 \section{Wheeled Vehicle Kinematics}
-This section is about how coordinate frames move according the geometry, velocities, rotational rates, positions and orientations of their mechanical elements. The focus is for differeny configurations of wheeled vehicles. 
+This section is about how coordinate frames move according the geometry, velocities, rotational rates, positions and orientations of their mechanical elements. The focus is for different configurations of wheeled vehicles. The goal of each subsection is to find out the relation between the actuators (usually wheel rotation rates and/or steering angles) and the kinematic state of the vehicle, which is usually a 2D twist $(v_x, v_y, w_z)$, corresponding to forward velocity, lateral velocity and rotational rate respectively. To simplify the notation, this 2D twist will be written as $(u, v, w)$ through this section. 
 
 \subsection{Single Wheel}
 The most basic mechanical element of wheeled vehicles are their wheels, so let's take a look on how they work from the kinematics point of view.
 
-A wheel is actuated with a motor providing a rotation rate to its axis, $w_w$. This rotation rate, will cause a linear velocity of the wheel center as: 
+A wheel is actuated with a motor providing a rotation rate to its axis, $\Omega$. This rotation rate, will cause a linear velocity of the wheel center as: 
 \begin{equation}
- v_w = w_w r_w
+ u = \Omega r
 \end{equation}
-where $r_w$ is the wheel radius. It is a straightforward example of how the geometry of a body shapes the relation between the actuation variable (rotational rate, $w_w$), and the derived state of the `vehicle` (linear velocity, $v_w$)
+where $r$ is the wheel radius. 
 
-In the following subsections the goal will be always to find the relation between the vehicle kinematics state (velocities) and its actuators. 
+Despite forward velocity, a single wheel has $v = w = 0$, since it is not actuated to cause motion other than forward (1D case). It is a straightforward example of how the geometry of a body shapes the relation between the actuation variable (rotational rate, $\Omega$), and the derived state of the `vehicle` (linear velocity, $u$)
+
+\subsection{Monocycle}
+
+\subsection{Bicycle}
+The bicycle case is the platform composed by two wheels mounted one in front of the other, separated by a distance $B$. The rear wheel drives the vehicle, while the front one steers it. Figure~\ref{fig:bike_kinematics} shows this configuration.
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/bike_kinematics.png}
+    \caption{Bicycle configuration.}
+    \label{fig:bike_kinematics}
+  \end{center}
+\end{figure}
+Actuator inputs are rear wheel rotation rate, $\Omega$, and front wheel steering angle, $\alpha$. Constructive parameters are the baseline distance between wheels ,$B$, and the rear wheel radius, $r$. Parameter $R$ in the figure~\ref{fig:bike_kinematics} is the curvature radius, which is an intermediate parameter of ineterst.
+
+The linear velocities are: 
+\begin{align}
+u = \Omega r \\
+v = 0
+\end{align} 
+and the vehicle should fulfill:
+\begin{equation}
+ u = wR.
+\end{equation}
+Given 
+\begin{equation}
+ \tan \alpha = \frac{B}{R}
+\end{equation}
+and matching the two previous expressions for $u$:
+\begin{equation}
+ u = \Omega r = wR = w\frac{B}{\tan \alpha} 
+\end{equation}
+leads to the expression for vehicle rotation rate: 
+\begin{equation}
+w=\frac{\Omega r}{B} \tan \alpha 
+\end{equation}
+
+In this case the forward kinematics is not linear, since the $w$ part of the twist involve a $\tan$ relation with the input parameter $\alpha$. 
+
+For several purposes it might be interesting to linearize this relation between input actuators, constructive parameters and output twist(see section~\ref{sec:Linearization} for linearization overview). Starting with the linearization with respect to the input actuators~$\alpha$ and~$\Omega$, the Jacobian is: 
+\begin{equation}
+\mathbf{J}_{\alpha \Omega} = 
+\left[
+ \begin{array}{cc}
+  0 & r  \\
+  0 & 0  \\
+  \frac{\Omega r}{B \cos ^2 \alpha} & \frac{r}{B}\tan \alpha
+ \end{array}
+ \right]; \\ 
+\end{equation}
+ so forward kinematics relation can be approximated by the linearization as follows: 
+\begin{equation}
+ \left[
+ \begin{array}{c}
+  u \\
+  v  \\
+  w 
+ \end{array}
+ \right] \approx \mathbf{J}_{\alpha \Omega}
+ \left[
+ \begin{array}{c}
+  \alpha \\
+  \Omega \\
+ \end{array} 
+ \right]
+\end{equation}
+which can be useful, for instance, for Kalman filtering (see section~\ref{sec:KalmanFilter}).
+
+If the interest is to analyze how sensitive is the kinematics to the constructive parameters, the goal is to compute the Jacobian matrix with respect to the parameters~$r$ and~$B$, and perform an error propagation analysis. First the linearized relation is: 
+\begin{equation}
+\mathbf{J}_{r B} = 
+\left[
+ \begin{array}{cc}
+  \Omega & 0  \\
+  0 & 0  \\
+  \frac{\Omega}{B}\tan \alpha & -\frac{\Omega r}{B^2}\tan \alpha
+ \end{array}
+ \right]; \\ 
+\end{equation}
+Given an uncertainty in the ~$r$ and~$B$ parameters, represented with a covariance matrix as:
+\begin{equation}
+\mathbf{C}_{r B} = 
+\left[
+ \begin{array}{cc}
+  \sigma^2_r & 0  \\
+  0 & \sigma^2_B  \\
+ \end{array}
+ \right]; \\ 
+\end{equation}
+the propagation of such uncertainty to twist space is: 
+\begin{equation}
+\mathbf{C}_{uvw} = \mathbf{J}_{r B} \mathbf{C}_{r B} \mathbf{J}_{r B}^T = 
+ \left[
+ \begin{array}{cc}
+  \Omega & 0  \\
+  0 & 0  \\
+  \frac{\Omega}{B}\tan \alpha & -\frac{\Omega r}{B^2}\tan \alpha
+ \end{array}
+ \right]
+ \left[
+ \begin{array}{cc}
+  \sigma^2_r & 0  \\
+  0 & \sigma^2_B  \\
+ \end{array}
+ \right]
+ \left[
+ \begin{array}{ccc}
+  \Omega & 0 & \frac{\Omega}{B}\tan \alpha\\
+  r & 0 & -\frac{\Omega r}{B^2}\tan \alpha
+ \end{array}
+ \right];
+\end{equation}
+\begin{equation}
+\mathbf{C}_{uvw} = 
+ \left[
+ \begin{array}{ccc}
+  \sigma^2_r \Omega^2 & 0 & \sigma^2_r \frac{\Omega^2}{B}\tan \alpha\\
+  0 & 0 & 0\\
+  \sigma^2_r \frac{\Omega^2}{B}\tan \alpha & 0 & \frac{\Omega^2}{B^2}\tan^2 \alpha (\sigma^2_r+\frac{r^2}{B^2} \sigma^2_B )
+ \end{array}
+ \right];
+\end{equation}
+Meaning that for a reasonable uncertainty values of $\sigma^2_r=10^{-6}\ m^2$ and $\sigma^2_B=10^{-6}\ m^2$ ($1\ mm$ of standard deviation in both cases~$r$ and~$B$), and evaluating at~$\Omega=2\pi\ rad/s$,~$\alpha=45^o$,~$r=0.4\ m$ and~$B=1\ m$, the standard deviations in linear speed and rotational rate of the vehicle are: 
+\begin{equation}
+ \sigma_u \approx 6\ mm/s ; \ \ \ \sigma_w \approx 4\ mrad/s ;
+\end{equation}
+
+
+
+
+
+\subsection{Tricycle}
+Drive front, steering front -> like monocycle
+Drive back, steering front -> like bicycle
+
 
 \subsection{Differential drive}
 Differential wheeled configuration is an essential and widely used architecture, due to its building simplicity and good manoeuvring properties, since it allows the platform to turn on the spot. 
@@ -19,16 +153,12 @@ Figure xxx shows the configuration as well as the involved parameters and variab
 
 Placing the platform axis at the mid point on the baseline joining the wheels, we define the twist of this frame as $(v_x, v_y, w_z)$, and it can be computed as: 
 
-
-\subsection{Bike}
-
-\subsection{Tricycle}
-
 \subsection{Ackermann (car-like)}
 
 \subsection{Double Ackermann}
 
 \subsection{Omniwheels}
+
 
 
 \subsection{Dynamics}
