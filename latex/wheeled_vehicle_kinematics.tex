@@ -1,6 +1,8 @@
 \section{Wheeled Vehicle Kinematics}
 This section is about how coordinate frames move according the geometry, velocities, rotational rates, positions and orientations of their mechanical elements. The focus is for different configurations of wheeled vehicles. The goal of each subsection is to find out the relation between the actuators (usually wheel rotation rates and/or steering angles) and the kinematic state of the vehicle, which is usually a 2D twist $(v_x, v_y, w_z)$, corresponding to forward velocity, lateral velocity and rotational rate respectively. To simplify the notation, this 2D twist will be written as $(u, v, w)$ through this section. 
 
+\subsection{Coriolis Law}
+
 \subsection{Single Wheel}
 The most basic mechanical element of wheeled vehicles are their wheels, so let's take a look on how they work from the kinematics point of view.
 
@@ -13,8 +15,16 @@ where $r$ is the wheel radius.
 Despite forward velocity, a single wheel has $v = w = 0$, since it is not actuated to cause motion other than forward (1D case). It is a straightforward example of how the geometry of a body shapes the relation between the actuation variable (rotational rate, $\Omega$), and the derived state of the `vehicle` (linear velocity, $u$)
 
 \subsection{Monocycle}
+The monocycle platform has a single wheel, which drives and steers the vehicle. The two actuators are the wheel rotational rate, $\Omega$, and the wheel steering rate~$\dot{\alpha}$. The wheel radius,~$r$, is the only constructive parameter. The generated twist is thus: 
+\begin{align}
+u = \Omega r \\
+v = 0 \\
+w = \dot{\alpha}
+\end{align} 
+
 
 \subsection{Bicycle}
+\label{subsec:bicycle}
 The bicycle case is the platform composed by two wheels mounted one in front of the other, separated by a distance $B$. The rear wheel drives the vehicle, while the front one steers it. Figure~\ref{fig:bike_kinematics} shows this configuration.
 \begin{figure}[bth!]
   \begin{center}
@@ -138,30 +148,127 @@ Meaning that for a reasonable uncertainty values of $\sigma^2_r=10^{-6}\ m^2$ an
 \end{equation}
 
 
-
-
-
 \subsection{Tricycle}
-Drive front, steering front -> like monocycle
-Drive back, steering front -> like bicycle
+The tricycle has two configurations, depending if the drive actuator is at the front axis or at the back one. In the former configuration, the kinematics relation is exactly those previously analyzed for the monocycle case. However, in the later configuration, the driving actuator is attached at the rear axis, providing a forward velocity, while the front wheel just steers the vehicle. So, this configuration is like the bicycle case analyzed above, but some extra differential mechanism is required to drive each rear wheel at different speeds when turning, otherwise the wheels would slip. 
 
 
-\subsection{Differential drive}
-Differential wheeled configuration is an essential and widely used architecture, due to its building simplicity and good manoeuvring properties, since it allows the platform to turn on the spot. 
+\subsection{2 wheels differential drive}
+Two wheels differential drive configuration is an essential and widely used architecture, due to its building simplicity and good manoeuvring properties, since it allows the platform to turn on the spot. 
 
-Figure xxx shows the configuration as well as the involved parameters and variables. 
+Figure~\ref{fig:differential_kinematics} shows the two wheels differential drive configuration as well as the involved parameters and variables. 
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/differential_kinematics.png}
+    \caption{Two wheels differential drive configuration.}
+    \label{fig:differential_kinematics}
+  \end{center}
+\end{figure}
 
-Placing the platform axis at the mid point on the baseline joining the wheels, we define the twist of this frame as $(v_x, v_y, w_z)$, and it can be computed as: 
+Actuator inputs are left and right wheel rotation rates, $\Omega_l, \Omega_r$. Constructive parameters are the baseline distance between wheels ,$B$, and the wheel radius, $r$. Parameter $R$ in the figure~\ref{fig:differential_kinematics} is the curvature radius, which is an intermediate parameter of ineterst.
 
-\subsection{Ackermann (car-like)}
+Placing the platform frame at the mid point on the baseline joining the wheels, we define the twist of this frame as $(u, v, w)$. Applying the Coriolis principle, three equations are deduced, for the left wheel contact point, the right wheel contact point and the vehicle origin, respectively:
+\begin{align}
+v_l = & \Omega_l r = w(R-\frac{B}{2}) \\
+v_r = & \Omega_r r = w(R+\frac{B}{2}) \\
+u = & wR \\
+\end{align} 
+operating on $v_r-v_l$, leads to:
+\begin{equation}
+w = \frac{v_r-v_l}{B}
+\end{equation}
+and solving for $v_r+v_l$, the linear forward velocity is:  
+\begin{equation}
+u = \frac{v_r+v_l}{2}
+\end{equation}
+
+In this case the kinematics relation between actuators and platform twist is linear, and can be written in the matrix form:
+\begin{equation}
+ \left[
+ \begin{array}{c}
+  u \\
+  w \\
+ \end{array}
+ \right] = 
+ \left[
+ \begin{array}{cc}
+  \frac{1}{2} & \frac{1}{2} \\
+  -\frac{1}{B} & \frac{1}{B} \\
+ \end{array}
+ \right]
+ \left[
+ \begin{array}{c}
+  v_l \\
+  v_r \\
+ \end{array}
+ \right] = 
+ \left[
+ \begin{array}{cc}
+  \frac{r}{2} & \frac{r}{2} \\
+  -\frac{r}{B} & \frac{r}{B} \\
+ \end{array}
+ \right]
+ \left[
+ \begin{array}{c}
+  \Omega_l \\
+  \Omega_r \\
+ \end{array}
+ \right]
+\end{equation}
+
+As in the bicycle case (see subsection \ref{subsec:bicycle}), we might be interested how errors on constructive parameters~$r$ and~$B$ propagate to the platform twist. In this case the Jacobian of the twist with respect to these parameters is computed as: 
+\begin{equation}
+\mathbf{J}_{r B} = 
+\left[
+ \begin{array}{cc}
+  \frac{1}{2}(\Omega_r+\Omega_l) & 0  \\
+  \frac{1}{B}(\Omega_r-\Omega_l) & \frac{r}{B^2}(\Omega_l-\Omega_r)  \\
+ \end{array}
+ \right]; \\ 
+\end{equation}
+Given an uncertainty in the ~$r$ and~$B$ parameters, represented with a covariance matrix as:
+\begin{equation}
+\mathbf{C}_{r B} = 
+\left[
+ \begin{array}{cc}
+  \sigma^2_r & 0  \\
+  0 & \sigma^2_B  \\
+ \end{array}
+ \right]; \\ 
+\end{equation}
+the propagation of such uncertainty to twist space is: 
+\begin{equation}
+\mathbf{C}_{uw} = \mathbf{J}_{r B} \mathbf{C}_{r B} \mathbf{J}_{r B}^T = 
+ \left[
+ \begin{array}{cc}
+ \frac{\sigma^2_r}{4}(\Omega_r+\Omega_l)^2 & \frac{\sigma^2_r}{4}(\Omega_r+\Omega_l)(\Omega_r-\Omega_l) \\
+ \frac{\sigma^2_r}{4}(\Omega_r+\Omega_l)(\Omega_r-\Omega_l) & \frac{\sigma^2_r}{4}(\Omega_r-\Omega_l)^2 + \frac{\sigma^2_B r^2}{B^4}(\Omega_l-\Omega_r)^2 \\
+ \end{array}
+ \right];
+ \label{eq:differential_twist_uncertainty}
+\end{equation}
+Result in equation~\ref{eq:differential_twist_uncertainty} suggests that error in baseline length~$B$ only affects the uncertainty of the platform rotation rate, while errors in wheel radius~$r$ propagates to both components of the twist~$u$ and ~$w$. 
+
+
+\subsection{4 wheels differential drive}
+
+
+
+
+
+
+\subsection{Ackermann}
 
 \subsection{Double Ackermann}
 
-\subsection{Omniwheels}
+\subsection{4W steering}
 
+\subsection{Synchro drive}
+
+\subsection{3 omniwheels}
+
+\subsection{4 omniwheels}
 
 
 \subsection{Dynamics}
-Coriolis: cases: Feature point, people tracking, ...
 
 
