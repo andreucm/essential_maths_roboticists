@@ -1,7 +1,29 @@
 \section{Wheeled Vehicle Kinematics}
 This section is about how coordinate frames move according the geometry, velocities, rotational rates, positions and orientations of their mechanical elements. The focus is for different configurations of wheeled vehicles. The goal of each subsection is to find out the relation between the actuators (usually wheel rotation rates and/or steering angles) and the kinematic state of the vehicle, which is usually a 2D twist $(v_x, v_y, w_z)$, corresponding to forward velocity, lateral velocity and rotational rate respectively. To simplify the notation, this 2D twist will be written as $(u, v, w)$ through this section. 
 
-\subsection{Coriolis Law}
+\subsection{Forward and inverse kinematics}
+Two relations are of interest between actuators and vehicle twist: \textit{forward} and i\textit{inverse} kinematics. 
+
+Forward kinematics gets actuator values as inputs and computes the twist, while inverse kinematics computes the actuator values given a twist as input. The former is generally of interest in estimation and prediction problems, while the later is usually of interest in planning and control. 
+
+\subsection{The Coriolis Law}
+Given two coordinate frames, one called \textit{moving}($\mathcal{M}$) which is rotating at angular velocity~$\mathbf{w}$ about the other frame, called \textit{fixed}($\mathcal{F}$). Then the derivative of any vector $\mathbf{x}$ with respect to the time is related by: 
+\begin{equation}
+\label{eq:coriolis}
+ \frac{d\mathbf{x}^{\mathcal{F}}}{dt} = \frac{d\mathbf{x}^{\mathcal{M}}}{dt} + \mathbf{w} \times  \mathbf{x}{\mathcal{F}}
+\end{equation}
+
+In the practical situation of a vehicle rotating about a fixed frame of reference, a given point~$\mathbf{r}$ of that vehicle (fixed with respect to the vehicle frame) has a null time derivative in the vehicle frame ($\frac{d\mathbf{r}^{\mathcal{M}}}{dt} = 0$), so equation~\ref{eq:coriolis} simplifies to the expression of the linear velocity of any point of the vehicle according to the rotation of the vehicle
+\begin{equation}
+ \mathbf{v} = \frac{d\mathbf{r}^{\mathcal{F}}}{dt} = \mathbf{w} \times \mathbf{r}^{\mathcal{F}}
+\end{equation}
+
+
+\subsection{Instantaneous Center of Rotation (ICR)}
+From mechanics, we know that all planar motions of a rigid body can be described as a pure rotation about some point, called the instantaneous center of rotation (ICR). All points of the rigid body can describe its motion as a rotation about the same ICR. 
+
+For kinematics analysis, it is of special interest the contact points of the wheels with the floor, since these points are fixed in the vehicle frame and they may have the wheel restriction of no slippage. 
+
 
 \subsection{Single Wheel}
 The most basic mechanical element of wheeled vehicles are their wheels, so let's take a look on how they work from the kinematics point of view.
@@ -37,6 +59,7 @@ Actuator inputs are rear wheel rotation rate, $\Omega$, and front wheel steering
 
 The linear velocities are: 
 \begin{align}
+\label{eq:bike_fwd_kinematics_1}
 u = \Omega r \\
 v = 0
 \end{align} 
@@ -54,10 +77,11 @@ and matching the two previous expressions for $u$:
 \end{equation}
 leads to the expression for vehicle rotation rate: 
 \begin{equation}
+\label{eq:bike_fwd_kinematics_2}
 w=\frac{\Omega r}{B} \tan \alpha 
 \end{equation}
 
-In this case the forward kinematics is not linear, since the $w$ part of the twist involve a $\tan$ relation with the input parameter $\alpha$. 
+In this case the forward kinematics is not linear, since the $w$ part of the twist involve a $\tan()$ relation with the input parameter $\alpha$. 
 
 For several purposes it might be interesting to linearize this relation between input actuators, constructive parameters and output twist(see section~\ref{sec:Linearization} for linearization overview). Starting with the linearization with respect to the input actuators~$\alpha$ and~$\Omega$, the Jacobian is: 
 \begin{equation}
@@ -148,11 +172,19 @@ Meaning that for a reasonable uncertainty values of $\sigma^2_r=10^{-6}\ m^2$ an
 \end{equation}
 
 
+\paragraph{Inverse kinematics}
+Inverse kinematics for the bicycle configuration is found from equations~\ref{eq:bike_fwd_kinematics_1} and~\ref{eq:bike_fwd_kinematics_2} as follows: 
+\begin{align}
+ \Omega & = \frac{u}{r} \\
+ \alpha & = \arctan(B\frac{w}{u}), \ \ \alpha \in [-\pi/2,\pi/2]
+\end{align}
+
+
 \subsection{Tricycle}
 The tricycle has two configurations, depending if the drive actuator is at the front axis or at the back one. In the former configuration, the kinematics relation is exactly those previously analyzed for the monocycle case. However, in the later configuration, the driving actuator is attached at the rear axis, providing a forward velocity, while the front wheel just steers the vehicle. So, this configuration is like the bicycle case analyzed above, but some extra differential mechanism is required to drive each rear wheel at different speeds when turning, otherwise the wheels would slip. 
 
 
-\subsection{2 wheels differential drive}
+\subsection{Two wheels differential drive}
 Two wheels differential drive configuration is an essential and widely used architecture, due to its building simplicity and good manoeuvring properties, since it allows the platform to turn on the spot. 
 
 Figure~\ref{fig:differential_kinematics} shows the two wheels differential drive configuration as well as the involved parameters and variables. 
@@ -174,15 +206,18 @@ u = & wR \\
 \end{align} 
 operating on $v_r-v_l$, leads to:
 \begin{equation}
+\label{eq:diff_drive_fwd_kinematics_w}
 w = \frac{v_r-v_l}{B}
 \end{equation}
 and solving for $v_r+v_l$, the linear forward velocity is:  
 \begin{equation}
+\label{eq:diff_drive_fwd_kinematics_u}
 u = \frac{v_r+v_l}{2}
 \end{equation}
 
 In this case the kinematics relation between actuators and platform twist is linear, and can be written in the matrix form:
 \begin{equation}
+\label{eq:diff_drive_fwd_kinematics_matrix}
  \left[
  \begin{array}{c}
   u \\
@@ -248,6 +283,13 @@ the propagation of such uncertainty to twist space is:
 \end{equation}
 Result in equation~\ref{eq:differential_twist_uncertainty} suggests that error in baseline length~$B$ only affects the uncertainty of the platform rotation rate, while errors in wheel radius~$r$ propagates to both components of the twist~$u$ and ~$w$. 
 
+\paragraph{Inverse kinematics}
+Inverse kinematics for the two wheels differential configuration can be derived by inverting the linear model in equation~\ref{eq:diff_drive_fwd_kinematics_matrix}, or from equations~\ref{eq:diff_drive_fwd_kinematics_u} and~\ref{eq:diff_drive_fwd_kinematics_w}: 
+\begin{align}
+ v_r & = u + w\frac{B}{2} \\
+ v_l & = u - w\frac{B}{2} \\
+\end{align}
+which suggests that for positive rotations, the right wheel should turn faster than the left one.
 
 \subsection{4 wheels differential drive}
 
