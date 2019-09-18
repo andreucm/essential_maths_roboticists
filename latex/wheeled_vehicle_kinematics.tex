@@ -7,22 +7,23 @@ Two relations are of interest between actuators and vehicle twist: \textit{forwa
 Forward kinematics gets actuator values as inputs and computes the twist, while inverse kinematics computes the actuator values given a twist as input. The former is generally of interest in estimation and prediction problems, while the later is usually of interest in planning and control. 
 
 \subsection{The Coriolis Law}
-Given two coordinate frames, one called \textit{moving}($\mathcal{M}$) which is rotating at angular velocity~$\mathbf{w}$ about the other frame, called \textit{fixed}($\mathcal{F}$). Then the derivative of any vector $\mathbf{x}$ with respect to the time is related by: 
+Given two coordinate frames, one called \textit{moving}($\mathcal{F}^M$) which is rotating at angular velocity~$\mathbf{w}$ about the other frame, called \textit{fixed}($\mathcal{F}^F$). Then the derivative of any vector $\mathbf{x}$ with respect to the time is related by: 
 \begin{equation}
 \label{eq:coriolis}
- \frac{d\mathbf{x}^{\mathcal{F}}}{dt} = \frac{d\mathbf{x}^{\mathcal{M}}}{dt} + \mathbf{w} \times  \mathbf{x}{\mathcal{F}}
+ \frac{d\mathbf{x}^F}{dt} = \frac{d\mathbf{x}^M}{dt} + \mathbf{w} \times  \mathbf{x}^F
 \end{equation}
+where~$\mathbf{x}$ can be , for instance, position, velocity or force. 
 
-In the practical situation of a vehicle rotating about a fixed frame of reference, a given point~$\mathbf{r}$ of that vehicle (fixed with respect to the vehicle frame) has a null time derivative in the vehicle frame ($\frac{d\mathbf{r}^{\mathcal{M}}}{dt} = 0$), so equation~\ref{eq:coriolis} simplifies to the expression of the linear velocity of any point of the vehicle according to the rotation of the vehicle
+In the practical situation of a vehicle rotating about a fixed frame of reference, a given point~$\mathbf{p}$ of that vehicle (fixed with respect to the vehicle frame) has a null time derivative in the vehicle frame ($\frac{d\mathbf{p}^M}{dt} = 0$), so equation~\ref{eq:coriolis} simplifies to the expression of the linear velocity of any point of the vehicle according to the rotation of the vehicle and the position of that point with respect to fixed frame.
 \begin{equation}
- \mathbf{v} = \frac{d\mathbf{r}^{\mathcal{F}}}{dt} = \mathbf{w} \times \mathbf{r}^{\mathcal{F}}
+ \mathbf{v} = \frac{d\mathbf{p}^F}{dt} = \mathbf{w} \times \mathbf{p}^F
 \end{equation}
 
 
 \subsection{Instantaneous Center of Rotation (ICR)}
 From mechanics, we know that all planar motions of a rigid body can be described as a pure rotation about some point, called the instantaneous center of rotation (ICR). All points of the rigid body can describe its motion as a rotation about the same ICR. 
 
-For kinematics analysis, it is of special interest the contact points of the wheels with the floor, since these points are fixed in the vehicle frame and they may have the wheel restriction of no slippage. 
+For kinematics analysis, it is of special interest the center of the wheels with the floor, since these points are fixed in the vehicle frame and they also have the wheel restriction of no slippage. 
 
 
 \subsection{Single Wheel}
@@ -36,18 +37,10 @@ where $r$ is the wheel radius.
 
 Despite forward velocity, a single wheel has $v = w = 0$, since it is not actuated to cause motion other than forward (1D case). It is a straightforward example of how the geometry of a body shapes the relation between the actuation variable (rotational rate, $\Omega$), and the derived state of the `vehicle` (linear velocity, $u$)
 
-\subsection{Monocycle}
-The monocycle platform has a single wheel, which drives and steers the vehicle. The two actuators are the wheel rotational rate, $\Omega$, and the wheel steering rate~$\dot{\alpha}$. The wheel radius,~$r$, is the only constructive parameter. The generated twist is thus: 
-\begin{align}
-u = \Omega r \\
-v = 0 \\
-w = \dot{\alpha}
-\end{align} 
-
 
 \subsection{Bicycle}
 \label{subsec:bicycle}
-The bicycle case is the platform composed by two wheels mounted one in front of the other, separated by a distance $B$. The rear wheel drives the vehicle, while the front one steers it. Figure~\ref{fig:bike_kinematics} shows this configuration.
+The bicycle case is the platform composed by two wheels mounted one in front of the other, separated by a distance $L$. The rear wheel drives the vehicle, while the front one steers it. Figure~\ref{fig:bike_kinematics} shows this configuration.
 \begin{figure}[bth!]
   \begin{center}
     \includegraphics[width=1.0\columnwidth]{figures/bike_kinematics.png}
@@ -55,7 +48,7 @@ The bicycle case is the platform composed by two wheels mounted one in front of 
     \label{fig:bike_kinematics}
   \end{center}
 \end{figure}
-Actuator inputs are rear wheel rotation rate, $\Omega$, and front wheel steering angle, $\alpha$. Constructive parameters are the baseline distance between wheels ,$B$, and the rear wheel radius, $r$. Parameter $R$ in the figure~\ref{fig:bike_kinematics} is the curvature radius, which is an intermediate parameter of ineterst.
+Actuator inputs are rear wheel rotation rate, $\Omega$, and front wheel steering angle, $\alpha$. Constructive parameters are the distance between wheels ,$L$, and the rear wheel radius, $r$. Parameter $R$ in the figure~\ref{fig:bike_kinematics} is the curvature radius, which is an intermediate parameter of ineterst.
 
 The linear velocities are: 
 \begin{align}
@@ -69,16 +62,16 @@ and the vehicle should fulfill:
 \end{equation}
 Given 
 \begin{equation}
- \tan \alpha = \frac{B}{R}
+ \tan \alpha = \frac{L}{R}
 \end{equation}
 and matching the two previous expressions for $u$:
 \begin{equation}
- u = \Omega r = wR = w\frac{B}{\tan \alpha} 
+ u = \Omega r = wR = w\frac{L}{\tan \alpha} 
 \end{equation}
 leads to the expression for vehicle rotation rate: 
 \begin{equation}
 \label{eq:bike_fwd_kinematics_2}
-w=\frac{\Omega r}{B} \tan \alpha 
+w=\frac{\Omega r}{L} \tan \alpha 
 \end{equation}
 
 In this case the forward kinematics is not linear, since the $w$ part of the twist involve a $\tan()$ relation with the input parameter $\alpha$. 
@@ -90,7 +83,7 @@ For several purposes it might be interesting to linearize this relation between 
  \begin{array}{cc}
   0 & r  \\
   0 & 0  \\
-  \frac{\Omega r}{B \cos ^2 \alpha} & \frac{r}{B}\tan \alpha
+  \frac{\Omega r}{L \cos ^2 \alpha} & \frac{r}{L}\tan \alpha
  \end{array}
  \right]; \\ 
 \end{equation}
@@ -112,47 +105,47 @@ For several purposes it might be interesting to linearize this relation between 
 \end{equation}
 which can be useful, for instance, for Kalman filtering (see section~\ref{sec:KalmanFilter}).
 
-If the interest is to analyze how sensitive is the kinematics to the constructive parameters, the goal is to compute the Jacobian matrix with respect to the parameters~$r$ and~$B$, and perform an error propagation analysis. First the linearized relation is: 
+If the interest is to analyze how sensitive is the kinematics to the constructive parameters, the goal is to compute the Jacobian matrix with respect to the parameters~$r$ and~$L$, and perform an error propagation analysis. First the linearized relation is: 
 \begin{equation}
-\mathbf{J}_{r B} = 
+\mathbf{J}_{r L} = 
 \left[
  \begin{array}{cc}
   \Omega & 0  \\
   0 & 0  \\
-  \frac{\Omega}{B}\tan \alpha & -\frac{\Omega r}{B^2}\tan \alpha
+  \frac{\Omega}{L}\tan \alpha & -\frac{\Omega r}{L^2}\tan \alpha
  \end{array}
  \right]; \\ 
 \end{equation}
-Given an uncertainty in the ~$r$ and~$B$ parameters, represented with a covariance matrix as:
+Given an uncertainty in the ~$r$ and~$L$ parameters, represented with a covariance matrix as:
 \begin{equation}
-\mathbf{C}_{r B} = 
+\mathbf{C}_{r L} = 
 \left[
  \begin{array}{cc}
   \sigma^2_r & 0  \\
-  0 & \sigma^2_B  \\
+  0 & \sigma^2_L  \\
  \end{array}
  \right]; \\ 
 \end{equation}
 the propagation of such uncertainty to twist space is: 
 \begin{equation}
-\mathbf{C}_{uvw} = \mathbf{J}_{r B} \mathbf{C}_{r B} \mathbf{J}_{r B}^T = 
+\mathbf{C}_{uvw} = \mathbf{J}_{r L} \mathbf{C}_{r L} \mathbf{J}_{r L}^T = 
  \left[
  \begin{array}{cc}
   \Omega & 0  \\
   0 & 0  \\
-  \frac{\Omega}{B}\tan \alpha & -\frac{\Omega r}{B^2}\tan \alpha
+  \frac{\Omega}{L}\tan \alpha & -\frac{\Omega r}{L^2}\tan \alpha
  \end{array}
  \right]
  \left[
  \begin{array}{cc}
   \sigma^2_r & 0  \\
-  0 & \sigma^2_B  \\
+  0 & \sigma^2_L  \\
  \end{array}
  \right]
  \left[
  \begin{array}{ccc}
-  \Omega & 0 & \frac{\Omega}{B}\tan \alpha\\
-  r & 0 & -\frac{\Omega r}{B^2}\tan \alpha
+  \Omega & 0 & \frac{\Omega}{L}\tan \alpha\\
+  r & 0 & -\frac{\Omega r}{L^2}\tan \alpha
  \end{array}
  \right];
 \end{equation}
@@ -160,13 +153,13 @@ the propagation of such uncertainty to twist space is:
 \mathbf{C}_{uvw} = 
  \left[
  \begin{array}{ccc}
-  \sigma^2_r \Omega^2 & 0 & \sigma^2_r \frac{\Omega^2}{B}\tan \alpha\\
+  \sigma^2_r \Omega^2 & 0 & \sigma^2_r \frac{\Omega^2}{L}\tan \alpha\\
   0 & 0 & 0\\
-  \sigma^2_r \frac{\Omega^2}{B}\tan \alpha & 0 & \frac{\Omega^2}{B^2}\tan^2 \alpha (\sigma^2_r+\frac{r^2}{B^2} \sigma^2_B )
+  \sigma^2_r \frac{\Omega^2}{L}\tan \alpha & 0 & \frac{\Omega^2}{L^2}\tan^2 \alpha (\sigma^2_r+\frac{r^2}{L^2} \sigma^2_L )
  \end{array}
  \right];
 \end{equation}
-Meaning that for a reasonable uncertainty values of $\sigma^2_r=10^{-6}\ m^2$ and $\sigma^2_B=10^{-6}\ m^2$ ($1\ mm$ of standard deviation in both cases~$r$ and~$B$), and evaluating at~$\Omega=2\pi\ rad/s$,~$\alpha=45^o$,~$r=0.4\ m$ and~$B=1\ m$, the standard deviations in linear speed and rotational rate of the vehicle are: 
+Meaning that for a reasonable uncertainty values of $\sigma^2_r=10^{-6}\ m^2$ and $\sigma^2_L=10^{-6}\ m^2$ ($1\ mm$ of standard deviation in both cases~$r$ and~$L$), and evaluating at~$\Omega=2\pi\ rad/s$,~$\alpha=45^o$,~$r=0.4\ m$ and~$L=1\ m$, the standard deviations in linear speed and rotational rate of the vehicle are: 
 \begin{equation}
  \sigma_u \approx 6\ mm/s ; \ \ \ \sigma_w \approx 4\ mrad/s ;
 \end{equation}
@@ -176,7 +169,7 @@ Meaning that for a reasonable uncertainty values of $\sigma^2_r=10^{-6}\ m^2$ an
 Inverse kinematics for the bicycle configuration is found from equations~\ref{eq:bike_fwd_kinematics_1} and~\ref{eq:bike_fwd_kinematics_2} as follows: 
 \begin{align}
  \Omega & = \frac{u}{r} \\
- \alpha & = \arctan(B\frac{w}{u}), \ \ \alpha \in [-\pi/2,\pi/2]
+ \alpha & = \arctan(L\frac{w}{u}), \ \ \alpha \in [-\pi/2,\pi/2]
 \end{align}
 
 
@@ -198,7 +191,7 @@ Figure~\ref{fig:differential_kinematics} shows the two wheels differential drive
 
 Actuator inputs are left and right wheel rotation rates, $\Omega_l, \Omega_r$. Constructive parameters are the baseline distance between wheels ,$B$, and the wheel radius, $r$. Parameter $R$ in the figure~\ref{fig:differential_kinematics} is the curvature radius, which is an intermediate parameter of ineterst.
 
-Placing the platform frame at the mid point on the baseline joining the wheels, we define the twist of this frame as $(u, v, w)$. Applying the Coriolis principle, three equations are deduced, for the left wheel contact point, the right wheel contact point and the vehicle origin, respectively:
+Placing the platform frame at the mid point on the baseline joining the wheels, we define the twist of this frame as $(u, v, w)$. Applying the Coriolis principle, three equations are deduced, for the left wheel center point, the right wheel center point and the vehicle origin, respectively:
 \begin{align}
 v_l = & \Omega_l r = w(R-\frac{B}{2}) \\
 v_r = & \Omega_r r = w(R+\frac{B}{2}) \\
@@ -286,19 +279,55 @@ Result in equation~\ref{eq:differential_twist_uncertainty} suggests that error i
 \paragraph{Inverse kinematics}
 Inverse kinematics for the two wheels differential configuration can be derived by inverting the linear model in equation~\ref{eq:diff_drive_fwd_kinematics_matrix}, or from equations~\ref{eq:diff_drive_fwd_kinematics_u} and~\ref{eq:diff_drive_fwd_kinematics_w}: 
 \begin{align}
+\label{eq:diff_drive_inv_kinematics}
  v_r & = u + w\frac{B}{2} \\
  v_l & = u - w\frac{B}{2} \\
 \end{align}
 which suggests that for positive rotations, the right wheel should turn faster than the left one.
 
 \subsection{4 wheels differential drive}
-
-
-
-
+At kinematics level, this configuration reduces to the case of two wheel differential drive since both left wheels have the same rotation rate and both right wheels have also the same rotation rate. However, when the vehicle is rotating, null lateral velocity at wheels is no longer fulfilled, so the wheels slip when turning. 
 
 
 \subsection{Ackermann}
+Ackermann system is the standard steering for most of the nowadays cars and trucks. Figure~\ref{fig:ackermann_kinematics} shows the steering mechanism, the constructive parameters~$B$ and~$L$ and the input actuators~$\alpha$ and~$u$, the later being directly the forward velocity to be transmitted to each rear wheel.  
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/ackermann_kinematics.png}
+    \caption{Ackermann configuration. Steering is achieved by actuating the orange bar.  }
+    \label{fig:ackermann_kinematics}
+  \end{center}
+\end{figure}
+
+The kinematics of the Ackermann configuration is reduced to the kinematics of the bike seen at subsection~\ref{subsec:bicycle}, with input actuators~$\alpha$ and~$u$, and constructive parameter~$L$.
+
+However, the Ackermann mechanism ensures a relation between the three steering angles~$\alpha_l$, $\alpha_r$ and~$\alpha$. Given an steering angle~$\alpha$, the tangent of the three triangles with vertex at ICR are: 
+\begin{align}
+\tan \alpha_l = & \frac{L}{R-\frac{B}{2}} \\
+\tan \alpha = & \frac{L}{R} \\
+\tan \alpha_r = & \frac{L}{R+\frac{B}{2}} 
+\end{align} 
+Solving for~$R$ at each equation leads to the following relation that Ackemrann steering should fulfill: 
+\begin{align}
+\tan \alpha_l = & \frac{1}{\frac{1}{\tan \alpha} - \frac{B}{2L}} \\
+\tan \alpha_r = & \frac{1}{\frac{1}{\tan \alpha} + \frac{B}{2L}} \\\end{align} 
+which is of interest in case of electronic Ackermann steering. 
+
+Even if forward velocity~$u$ is transmitted to each rear wheel,  velocities of each of these wheels are different and constrained with the vehicle twist. Usually a differential mechanism implements this difference of speeds, but an electronic implementation may implement that, fulfilling the following: 
+\begin{align}
+v_l = & w(R-\frac{B}{2}) \\
+v_r = & w(R+\frac{B}{2})
+\end{align} 
+which as it has been seen with the two wheel differential drive at equations~\ref{eq:diff_drive_inv_kinematics}, it leads to: 
+\begin{align}
+v_l = & u -w\frac{B}{2} \\
+v_r = & u + w\frac{B}{2}
+\end{align} 
+
+
+
+
+
 
 \subsection{Double Ackermann}
 
