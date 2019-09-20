@@ -326,18 +326,148 @@ v_r = & u + w\frac{B}{2}
 
 
 
-
-
-
 \subsection{Double Ackermann}
+Double Ackermann configuration refers to those vehicles having an Ackermann steering system (mechanical or electronical) for front and back wheels, actuating both with the same steering angle, so the ICR point is no longer at the line joining rear wheels , but it is at the line parallel to that but passing through the center of the vehicle. This allows such vehicles to make sharper turns than single Ackermann steering configurations. The configuration of double Ackermann steering can be reduced to a bicycle with  steering at front and back wheels, as shown in figure~\ref{fig:double_ackermann_kinematics}.
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/double_ackermann_kinematics.png}
+    \caption{Double Ackermann configuration can be reduced to the double steering bike.}
+    \label{fig:double_ackermann_kinematics}
+  \end{center}
+\end{figure}
 
-\subsection{4W steering}
+The analysis of this double steering bicycle starts by applying the Coriols principle at the center of each wheel, as well as at the center of the bicycle:
+\begin{align}
+\mathbf{v_B} = & 
+\left[
+ \begin{array}{c}
+  0  \\
+  0  \\
+  w 
+ \end{array}
+\right]
+\times 
+\left[
+ \begin{array}{c}
+  -\frac{L}{2}  \\
+  -R  \\
+  0 
+ \end{array}
+\right]
+= 
+\left[
+ \begin{array}{c}
+  wR  \\
+  -w\frac{L}{2}  \\
+  0 
+ \end{array}
+\right] \\
+\mathbf{u} = & 
+\left[
+ \begin{array}{c}
+  0  \\
+  0  \\
+  w 
+ \end{array}
+\right]
+\times 
+\left[
+ \begin{array}{c}
+  0  \\
+  -R  \\
+  0 
+ \end{array}
+\right]
+= 
+\left[
+ \begin{array}{c}
+  wR  \\
+  0  \\
+  0 
+ \end{array}
+\right] \\
+\mathbf{v_F} = & 
+\left[
+ \begin{array}{c}
+  0  \\
+  0  \\
+  w 
+ \end{array}
+\right]
+\times 
+\left[
+ \begin{array}{c}
+  \frac{L}{2}  \\
+  -R  \\
+  0 
+ \end{array}
+\right]
+= 
+\left[
+ \begin{array}{c}
+  -wR  \\
+  w\frac{L}{2}  \\
+  0 
+ \end{array}
+\right]
+\end{align} 
+The above velocity vectors~$\mathbf{v_B}$, $\mathbf{u}$ and~$\mathbf{v_F}$ are expressed with respect to a frame placed at ICR and aligned with the vehicle frame, so the same velocity vectors are also with respect to the vehicle frame (since there is no rotation between these two frames). For the back wheel, in 2D, we have: 
+\begin{equation}
+\mathbf{v_B} = 
+\left[
+ \begin{array}{c}
+  wR  \\
+  -w\frac{L}{2} 
+ \end{array}
+\right]
+=
+|\mathbf{v_B}|r
+\left[
+ \begin{array}{c}
+  \cos \alpha  \\
+  \sin \alpha
+ \end{array}
+\right]
+=
+\Omega_Br
+\left[
+ \begin{array}{c}
+  \cos \alpha  \\
+  \sin \alpha
+ \end{array}
+\right]
+\end{equation}
+so we can find $R$ and $w$ as: 
+\begin{align}
+ R = & \frac{\Omega_B r}{w}\cos \alpha \\
+ w = & \frac{2\Omega_B r}{L}\sin \alpha \\
+\end{align}
+and then, with the expression of $\mathbf{u}=\left[u_x\ u_y \right]^T$ in 2D: 
+\begin{equation}
+ u_x = wR = \Omega_Br \cos \alpha \ ; \ \ u_y = 0; 
+\end{equation}
 
-\subsection{Synchro drive}
+A parctical case of double Ackermann steering (or even more than double!) is the straddle carrier family (see figure~\ref{fig:straddle_carrier}), which are large vehicles that need to manoeuver usually in tight spaces with respect to their dimensions~$L$ and~$B$. 
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=0.6\columnwidth]{figures/straddle_carrier.jpg}
+    \caption{Straddle carriers are big vehicles that need to perform good manoeuvring, so they have double (or even quadruple like in this picture) Ackermann steering, usually implemented with electronic/software means instead of by a mechanism.}
+    \label{fig:straddle_carrier}
+  \end{center}
+\end{figure}
+
+
+\subsection{Omniwheel}
+Omniwheels refers to those wheels that have an extra set of small rollers mounted with their axis aligned with the wheel tangential line. These rollers allow the wheel to freely move in a lateral motion, while keeping the actuated forward (standard) motion of a wheel. 
 
 \subsection{3 omniwheels}
+A typical configuration using omniwheels is that of mounting three of them in triangular base, as depicted in figureXXX.
+
+
 
 \subsection{4 omniwheels}
+
+\subsection{4 mecanum wheels}
 
 
 \subsection{Dynamics}
