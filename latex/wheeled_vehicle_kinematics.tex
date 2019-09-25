@@ -27,6 +27,7 @@ For kinematics analysis, it is of special interest the center of the wheels with
 
 
 \subsection{Single Wheel}
+\label{subsec:single_wheel}
 The most basic mechanical element of wheeled vehicles are their wheels, so let's take a look on how they work from the kinematics point of view.
 
 A wheel is actuated with a motor providing a rotation rate to its axis, $\Omega$. This rotation rate, will cause a linear velocity of the wheel center as: 
@@ -457,15 +458,241 @@ A parctical case of double Ackermann steering (or even more than double!) is the
 \end{figure}
 
 
-\subsection{Omniwheel}
-Omniwheels refers to those wheels that have an extra set of small rollers mounted with their axis aligned with the wheel tangential line. These rollers allow the wheel to freely move in a lateral motion, while keeping the actuated forward (standard) motion of a wheel. 
+\subsection{Holonomic wheels}
+Holonomic wheels refers to those wheels that have an extra set of small rollers mounted with their axis forming an angle $\gamma$ with the wheel perpendicular direction of driving. This angle $\gamma$ is usually $0$~degrees for \textit{omniwheels} or $45$~degrees for \textit{mecanum} wheels. These rollers allow the wheel to freely move in lateral motion, while keeping the actuated forward (standard) motion of a wheel, so the constraint of null lateral motion described in~\ref{subsec:single_wheel} no longer fulfills. 
 
-\subsection{3 omniwheels}
-A typical configuration using omniwheels is that of mounting three of them in triangular base, as depicted in figureXXX.
+Figure\ref{fig:omniwheel_kinematics} shows the involved frames and vectors to analyze the inverse kinematics of an omniwheel mounted in a vehicle frame.
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/omniwheel_kinematics.png}
+    \caption{Frames and vectors involved in the omniwheel kinematcs analysis. Vehicle frame in green and red. In yellow wheel driving direction and in brown wheel free sliding direction for omniwheels. }
+    \label{fig:omniwheel_kinematics}
+  \end{center}
+\end{figure}
 
+Given a vehicle twist~$[u v w]$, the procedure will find the inverse kinematics model, so the required wheel angular speeds for each wheel. The first step is to find the linear velocity of the wheel center with respect to the vehicle base frame~$\mathcal{F}^B$, given the vehicle twist, by applying the Coriolis law: 
+\begin{equation}
+\mathbf{v^B_i} = 
+\left[
+ \begin{array}{c}
+  u  \\
+  v \\
+  0
+ \end{array}
+\right]
++
+\left[
+ \begin{array}{c}
+  0  \\
+  0 \\
+  w
+ \end{array}
+\right]
+\times
+\left[
+ \begin{array}{c}
+  x_i \\
+  y_i
+ \end{array}
+\right] 
+= 
+\left[
+ \begin{array}{c}
+  u  \\
+  v \\
+  0
+ \end{array}
+\right]
++
+\left[
+\begin{array}{c}
+ -w y_i \\
+ w x_i \\
+ 0
+\end{array}
+\right] 
+= 
+\left[
+\begin{array}{ccc}
+ 1 & 0 & -y_i \\
+ 0 & 1 &  x_i 
+\end{array}
+\right] 
+\left[
+\begin{array}{c}
+ u \\
+ v \\
+ w
+\end{array}
+\right] 
+\end{equation}
+
+Once we know the wheel center linear speed with respect to the vehicle frame, we will transform it to the wheel frame by applying the rotation (only the 2D part): 
+\begin{equation}
+\mathbf{v^{W}_i} = 
+\left[
+ \begin{array}{cc}
+  \cos \beta_i & \sin \beta_i  \\
+  -\sin \beta_i & \cos \beta_i \\
+ \end{array}
+\right]
+\left[
+\begin{array}{ccc}
+ 1 & 0 & -y_i \\
+ 0 & 1 &  x_i 
+\end{array}
+\right] 
+\left[
+\begin{array}{c}
+ u \\
+ v \\
+ w
+\end{array}
+\right] 
+\end{equation}
+
+Finally, from~$\mathbf{v^{W}_i}$, we only take the first component, which is the actuated velocity (aligned with the wheel driving direction): 
+\begin{equation}
+u_i
+=
+\left[
+\begin{array}{cc}
+ 1 & 0
+\end{array}
+\right]
+\left[
+ \begin{array}{cc}
+  \cos \beta_i & \sin \beta_i  \\
+  -\sin \beta_i & \cos \beta_i \\
+ \end{array}
+\right]
+\left[
+\begin{array}{ccc}
+ 1 & 0 & -y_i \\
+ 0 & 1 &  x_i 
+\end{array}
+\right] 
+\left[
+\begin{array}{c}
+ u \\
+ v \\
+ w
+\end{array}
+\right] 
+\end{equation}
+which can be simplified to: 
+\begin{equation}
+u_i 
+=
+\left[
+\begin{array}{ccc}
+ \cos \beta_i & \sin \beta_i & -y_i\cos \beta_i+x_i \sin \beta_i
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+ u \\
+ v\\
+ w
+\end{array}
+\right]
+\label{eq:single_omniwheel_inverse_kniematics}
+\end{equation}
+
+A vehicle with $N$ omniwheels (at least $N=3)$, will stack $N$ equations that constraint the actuated wheel angular speeds given the vehicle twist. The following subsections analyses the cases for $N=3$ and $N=4$. 
 
 
 \subsection{4 omniwheels}
+The four omniwheels configuration is a rather standard platform allowing high manoeuvrability and stability. Figure~\ref{fig:four_omniwheels_kinematics} shows this configuration when mounted in a squared platform of side size $2L$.
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/four_omniwheels_kinematics.png}
+    \caption{Configuration for a platforme with four omniwheels in a square base of side size $2L$.}
+    \label{fig:four_omniwheels_kinematics}
+  \end{center}
+\end{figure}
+
+Table~\ref{tab:params_4_omni} details the constructive parameters~$x_i,y_i,B_i$ for this vehicle. 
+\begin{table}[hbt] \centering
+\caption{Constructive parameters for squared 4-omniwheel vehicle of side size $2L$}
+\begin{tabular}
+[c]{|c|c|c|c|}\hline
+		& $x_i$ 		& $y_i$				& $\beta_i$ \\\hline
+Wheel 0 & $L$ 		    & $-L$				& $\pi/4$ \\\hline
+Wheel 1 & $L$ 		    & $L$				& $3\pi/4$ \\\hline
+Wheel 2 & $-L$ 		    & $L$				& $5\pi/4$ \\\hline
+Wheel 3 & $-L$ 		    & $-L$				& $7\pi/4$ \\\hline
+\end{tabular}
+\label{tab:params_4_omni}
+\end{table}
+
+With the constructive parameters, wheel actuated speeds can be computed by applying equation~\ref{eq:single_omniwheel_inverse_kniematics} for each wheel ($i=0,..,3$):
+\begin{equation}
+\left[
+\begin{array}{c}
+u_0 \\
+u_1 \\
+u_2 \\
+u_3 \\
+\end{array}
+\right]
+=
+\left[
+\begin{array}{ccc}
+ \cos \beta_i & \sin \beta_i & -y_i\cos \beta_i+x_i \sin \beta_i
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+ u \\
+ v\\
+ w
+\end{array}
+\right], 
+\end{equation}
+
+so the full inverse kinematics results as follows: 
+\begin{equation}
+\left[
+\begin{array}{c}
+u_0 \\
+u_1 \\
+u_2 \\
+u_3 \\
+\end{array}
+\right]
+=
+\left[
+\begin{array}{ccc}
+ \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & L\sqrt{2} \\
+ -\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & L\sqrt{2} \\
+ -\frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}} & L\sqrt{2} \\
+ \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}} & L\sqrt{2} \\
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+ u \\
+ v\\
+ w
+\end{array}
+\right], 
+\end{equation}
+
+Please remind that $u_i$ are the linear speeds of wheel centers in the driving direction. To find the angular speed of the wheel we have to apply $\Omega_i = u_i/r$, where $r$ is the radius of the wheel. 
+
+
+
+\subsection{3 omniwheels}
+A typical configuration using omniwheels is also that of mounting three of them in an equilateral triangle base, as depicted in figure~\ref{fig:three_omniwheels_kinematics}.
+\begin{figure}[bth!]
+  \begin{center}
+    \includegraphics[width=1.0\columnwidth]{figures/three_omniwheels_kinematics.png}
+    \caption{Configuration for a platforme with three omniwheels in an equilateral triangle.}
+    \label{fig:three_omniwheels_kinematics}
+  \end{center}
+\end{figure}
+
 
 \subsection{4 mecanum wheels}
 
