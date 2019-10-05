@@ -1,6 +1,9 @@
 
-\section{Differentation}
+\section{Differentation and Linearization}
+\label{sec:Linearization}
+Differentation is the main tool to analyse how sensitive is a function with respect to each of the input variables. In some cases it might be interesting to linearize functions to simplify computations in order to speed up processing loops. 
 
+\subsection{Differentation}
 Let $f(\mathbf{x})$ be a scalar function, where $\mathbf{x} \in \mathbb{R}^n$. A \textbf{partial derivative} of $f()$ with respect to the $i-th$ component $x_i$ is defined as: 
 \begin{equation}
  \frac{\partial f(\mathbf{x}) }{\partial x_i}
@@ -56,3 +59,104 @@ Finally, the \textbf{Hessian} matrix, defined for a function $f:\mathbb{R}^n \ri
 \end{array}
 \right]
 \end{equation}
+
+\paragraph{Example \theexamplecounter. Jacobian of vehicle frames.}
+%\label{example:vehicle_frames}
+\stepcounter{examplecounter}
+The example illustrated with figure~\ref{fig:world_vehicle_sensor_frames} computed the rigid transformation of a point $\mathbf{q}^S$ expressed with respect to a sensor frame, to the same point with respect to the frame at the origin of the trajectory, $\mathbf{q}^O$. The later can be seen as a function: 
+\begin{equation}
+ \mathbf{q}^O : \mathbb{R}^8 \rightarrow \mathbb{R}^2
+\end{equation}
+since it depends on eight variables: $q^S_x,q^S_y,m^B_x,m^B_y,\beta,p^O_x,p^O_y,\theta$ in the following way (from equation~\ref{eq:world_vehicle_sensor_frames}): 
+\begin{equation}
+ \left[
+\begin{array}{c}
+    \mathbf{q}^O\\
+    1 \\
+ \end{array}
+\right] = 
+\mathbf{T}^O_B \mathbf{T}^B_S 
+\left[
+\begin{array}{c}
+    \mathbf{q}_S\\
+    1 \\
+ \end{array}
+\right] = 
+\left[
+\begin{array}{ccc}
+    \cos(\theta+\beta) & -\sin(\theta+\beta) & m^B_x\cos\theta-m^B_y\sin\theta+p^O_x \\
+    \sin(\theta+\beta) &  \cos(\theta+\beta) & m^B_y\sin\theta+m^B_y\cos\theta+p^O_y \\
+    0 & 0 & 1
+ \end{array}
+\right]
+\left[
+\begin{array}{c}
+    \mathbf{q}_S\\
+    1 \\
+ \end{array}
+\right]
+\end{equation}
+
+\begin{equation}
+\mathbf{q}^O = 
+\left[
+\begin{array}{c}
+    q^S_x\cos(\theta+\beta) - q^S_y\sin(\theta+\beta) + m^B_x\cos\theta-m^B_y\sin\theta+p^O_x \\
+    q^S_x\sin(\theta+\beta) + q^S_y\cos(\theta+\beta) + m^B_x\sin\theta+m^B_y\cos\theta+p^O_y \\
+    1
+ \end{array}
+\right]
+\end{equation}
+
+So the full Jacobian of $\mathbf{q}^O$,~$\mathbf{J}_{\mathbf{q}^O}$, is the following $2\times 8$ matrix: 
+\scriptsize
+\begin{equation}
+\mathbf{J}_{\mathbf{q}^O} = 
+\left[
+\begin{array}{cccccccc}
+c(\theta+\beta) & -s(\theta+\beta) & c\theta & -s\theta &
+-q^S_x s(\theta+\beta)-q^S_y c(\theta+\beta) & 1 & 0 & 
+-q^S_x s(\theta+\beta)-q^S_y c(\theta+\beta)-m^B_x s\theta-m^B_y c\theta\\
+s(\theta+\beta) & c(\theta+\beta) & s\theta & -c\theta &
+q^S_x c(\theta+\beta)-q^S_y s(\theta+\beta) & 0 & 1 &
+q^S_x c(\theta+\beta)-q^S_y s(\theta+\beta)+m^B_x c\theta-m^B_y s\theta\\
+\end{array}
+\right]
+\end{equation}
+\normalsize
+where $c\alpha=\cos(\alpha)$ and $s\alpha=\sin(\alpha)$. This Jacobian shows how sensitive is the function $\mathbf{q}^O$ to each of the eight input variables. It can be easily seen, for instance, that~${q}^O_x$ is not sensitive to ${p}^O_y$. And also that when $\theta=0$,~${q}^O_y$ is not sensitive with~$m^B_x$. Jacobians will be very useful in error propagation analysis as it will be seen in section~\ref{sec:random_variables}.
+
+%\section{Linearization}
+\subsection{One-dimensional Taylor's Theorem}
+From [xx], the Taylor's theorem for a one-dimensional function can be expressed as follows: Let $k \ge 1$ be an integer and let the function $f:\mathbb{R} \rightarrow \mathbb{R}$ be $k$ times differentiable at the point $a\in\mathbb{R}$. Then there exists a function $h_k:\mathbb{R} \rightarrow \mathbb{R}$ such that:
+\begin{equation}
+ f(x) = f(a) + \frac{\partial f }{\partial x}(a)(x-a) + \frac{1}{2!}\frac{\partial^2 f }{\partial x^2}(a)(x-a)^2 + \dots
+ + \frac{1}{k!}\frac{\partial^k f }{\partial x^k}(a)(x-a)^k + h_k(x)(x-a)^k.
+\end{equation}
+and $\lim_{x\to\infty}h_k(x)=0$.
+
+Basically, the Taylor's theorem is saying that in the point $x=a$, a function $f(x)$ can be approximated by computing the successive derivatives, from order~$0$ (which is the constant $f(a)$) up to order~$k$. Sometimes it is of great interest to have an approximation of a function around a point, so we can compute it fastly, or manipulate it easily. On particular case is when $k=1$, which is called a \textit{linearization} of the function, since the approximation takes into account just the first derivative $(k=1)$, so we have:
+\begin{equation}
+f(x) \approx f(a) + \frac{\partial f }{\partial x}(a)(x-a)
+\end{equation}
+Reacall that the approximation is only valid around the point $x=a$.
+
+\subsection{Multi-dimensional Taylor's Theorem (1st order)}
+Following the same idea, the Taylor's theorem is formulated for multi-variate functions such as:
+\begin{equation}
+ f:\mathbb{R}^n \rightarrow \mathbb{R}^m
+\end{equation}
+then the Taylor's Theorem up to the first order derivatives (linearization of~$f$ around the point~$\mathbf{a}$) is:
+\begin{equation}
+f(\mathbf{x}) \approx f(\mathbf{a}) + \mathbf{J}_f(\mathbf{a})(\mathbf{x}-\mathbf{a})
+\end{equation}
+where~$\mathbf{J}_f(\mathbf{a})$ is the Jacobian of function~$\mathbf{f}$ evaluated at point~$\mathbf{a}$.
+
+
+% \paragraph{Example}
+% //TODO Example Rot velocity -> rot matrix 
+
+\subsection{Linearization error}
+% TODO
+
+
