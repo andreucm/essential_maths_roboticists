@@ -682,7 +682,6 @@ u_3 \\
 Please remind that $u_i$ are the linear speeds of wheel centers in the driving direction. To find the angular speed of the wheel we have to apply $\Omega_i = u_i/r$, where $r$ is the radius of the wheel. 
 
 
-
 \subsection{3 omniwheels}
 A typical configuration using omniwheels is also that of mounting three of them in an equilateral triangle base, as depicted in figure~\ref{fig:three_omniwheels_kinematics}.
 \begin{figure}[bth!]
@@ -692,6 +691,46 @@ A typical configuration using omniwheels is also that of mounting three of them 
     \label{fig:three_omniwheels_kinematics}
   \end{center}
 \end{figure}
+
+In this case table~\ref{tab:params_3_omni} shows the constructive parameters  $x_i,y_i,B_i$: 
+\begin{table}[hbt] \centering
+\caption{Constructive parameters for triangular 3-omniwheel vehicle of side size $2L$}
+\begin{tabular}
+[c]{|c|c|c|c|}\hline
+		& $x_i$ 		    & $y_i$				& $\beta_i$ \\\hline
+Wheel 0 & $L$ 		        & $0$				& $3\pi/6$ \\\hline
+Wheel 1 & $-L\sin(\pi/6)$   & $L\cos(\pi/6)$	& $7\pi/6$ \\\hline
+Wheel 2 & $-L\sin(\pi/6)$ 	& $-L\cos(\pi/6)$	& $11\pi/4$ \\\hline
+\end{tabular}
+\label{tab:params_3_omni}
+\end{table}
+
+Therefore, applying equation~\ref{eq:single_omniwheel_inverse_kniematics}, the inverse kinematics results in the following: 
+\begin{equation}
+\left[
+\begin{array}{c}
+u_0 \\
+u_1 \\
+u_2 \\
+\end{array}
+\right]
+=
+\left[
+\begin{array}{ccc}
+ 0      & 1     & L \\
+-\frac{\sqrt{3}}{2} & -\frac{1}{2} & L \\
+ \frac{\sqrt{3}}{2} & -\frac{1}{2} & L \\
+\end{array}
+\right]
+\left[
+\begin{array}{c}
+ u \\
+ v \\
+ w
+\end{array}
+\right]
+\end{equation}
+
 
 
 \subsection{4 mecanum wheels}
