@@ -1,0 +1,209 @@
+\section{Simultaneous Localization and Mapping (SLAM)}
+\label{sec:slam}
+Simultaneous localization and mapping is the problem of building a representation of the environment (a map) while keep the robot localized within this representation. It is a problem of major importance in robotics, since mapping is a procedure often required in a deployment step of a mobile robotics system. Moreover, the same techniques developed in SLAM are also used, for instance, to calibrate the position of a set of static markers in the environement, which can be seen as a mapping problem where the map is just built as a set of landmarks. 
+
+\subsection{Types of maps}
+A map is a representation of the environment, designed with a target purpose, usually linked with some computational process. Examples of these processes that motivate the design of a map are path planning, compute expected sensor measurements, localize some key points of the environment or share the representation with humans.
+
+Since there is a broad collection of algorithms and sensors to solve the above listed processes, different environment representations are used in robotics. They are mainly classified with two main types: \textit{metric} maps and \textit{topological maps}. 
+
+\subsubsection{Metric maps} 
+Metric maps are those representations that keep the euclidean spanning of the 2D or 3D space, so the elelments in the map are placed in it with their euclidean coordinates with respect to the map frame. Within metric maps, there are two big families: \textit{dense} maps and \textit{sparse} maps.
+
+\paragraph{Dense maps} represent the whole environment, both the free and the occupied space, and do neither extract features nor detect landmarks from them, so areas or volumes are always represented by a set of elements that tesselate the space, basically indicating either their occupancy probability or some other basic data such as color, elevation or surface normal vector. Examples of these representations are occupancy grids for 2D or voxel grids for 3D. These grids can be regular or not, in the later case they can be organized with \textit{N-trees}. 
+
+\paragraph{Sparse maps} represent the environment as a set of features. These features have euclidean coordinates with respect to the map frame and may also have some descriptive attributes. Examples of these features are geometric (points, lines, planes, corners) or visual (key points such as SURF or ORB). Artificial landmarks (such as QR codes or RF beacons) may be also considered as points in the map, therefore a case of point-based maps where the descriptive attribute is just an \textit{id}. 
+
+\subsubsection{Topological maps} 
+Topological maps are those representations that describe the environment as a graph, with a set of nodes and links, but metric information is not necessarily kept. Instead, the information represented correspoends to the relationships between nodes. These representations are usually used for high level planning or human-robot interaction, but also for loop closure detections in mapping. Nodes may represent entities such as places, and links may indicate if places are connected so a robot can visit one coming from the other. 
+
+
+\subsection{SLAM front-end}
+According to the choosen map representation, a \textit{front-end} part of the SLAM process is in charge of collecting sensor readings and extract those relevant information to be passed to the back-end, which is the solver part of the problem. Front-end steps are the most tricky part of SLAM, and there is a broad use of techniques. The final success of the whole SLAM  proceudre is usually very sensitive to the front-end performance in terms of accuracy, robustness or computational speed.  
+
+
+Examples of processes computed in the front-end may be: 
+\begin{itemize}
+ \item Geometric feature detection (points, lines, planes, corners).
+ \item Visual feature detection and descriptor.
+ \item Matching 2D/3D between two scans/point clouds, to extract a pose constraint between two points of view of the environment. 
+ \item Visual Odomertry between two images, to extract a pose constraint between two points of view of the environment. 
+\end{itemize}
+
+\paragraph{Data association} in the SLAM front-end, specially for feature-based maps, there is a critical step called \textit{data association} which tries to find correspondences between the set of current detected features and the set of already mapped ones. This step usually uses a first metric check to generate candidate correspondences, and then uses the descriptive attributes of features (detected and already mapped) to finally find correspondences.
+
+
+\subsection{SLAM back-end}
+The back-end side of the SLAM problem is related to the estimator or solver process to \textit{find the best map according measurements}. In the 1990's and 2000's Kalman filter approaches were proposed and developed, but since 2010's, Graph-based techniques have been developed. 
+
+\subsection{Kalman Filter based SLAM}
+The key idea of Kalman filter based SLAM is to augment the robot localization state with the set of coordinates of all the features building the map, so this approach works mainly for sparse maps (feature-based).
+
+In SLAM, the state is: 
+\begin{equation}
+ \mathbf{x} = (\mathbf{x}^M_r,\mathbf{x}^M_0,\dots,\mathbf{x}^M_i,\dots,\mathbf{x}^M_{N-1})^T
+\end{equation}
+
+where the first vector $\mathbf{x}^M_r$ is the pose of the robot with respect to the map frame and the other vectors $\mathbf{x}^M_i$ are the coordinates of all the features that build the map. This state is the one to be optimally estimated by the Kalman filter. 
+
+In 2D the state becomes to: 
+\begin{equation}
+ \mathbf{x} = (x^M_r,y^M_r,\theta^M_r,x^M_0,y^M_0,\dots,x^M_i,y^M_i,\dots,x^M_{N-1},y^M_{N-1})^T
+\end{equation}
+
+while in 3D, in case of using quaternion representaion for rotations, the state is: 
+\begin{equation}
+ \mathbf{x} = (x^M_r,y^M_r,z^M_r,q^M_i,q^M_j,q^M_k,x^M_0,y^M_0,z^M_0,\dots,x^M_i,y^M_i,z^M_i,\dots,x^M_{N-1},y^M_{N-1},z^M_{N-1})^T
+\end{equation}
+
+In both cases, the state could be augmented with other robot state components, such as linear or rotational velocities, or accelerations.
+
+Once the state space is defined, the Kalman Filter requires to design two models (see chapter~\ref{sec:KalmanFilter}): the state prediction model, linearized with the matrix~$\mathbf{F}$, and the observation or measurement model, linearized with the matrix~$\mathbf{H}$. 
+
+We will derive here both models for a differential drive robot on the plane (2D case), and for the landmark-based map, which is, for instance, the case of a map representing the poses of a set of artificial QR marks. 
+
+Starting with the \textbf{prediction model}, since the poses of the landmarks in the map are assumed to be static, the model is just the predictive model for the vehicle state, and an Identity matrix for the landmarks. The linear predictive model of the vehicle state is computed with the twist input, which is $(v,w)$ for differential platforms:
+\footnotesize
+\begin{equation}
+\mathbf{F} = 
+\left[
+ \begin{array}{cccccccccc}
+ 1 & 0 & -v\Delta T \sin(\theta^M_r) & 0 & 0 & 0 & \dots & 0 & 0 & 0 \\ 
+ 0 & 1 & v\Delta T \cos(\theta^M_r) & 0 & 0 & 0 & \dots & 0 & 0 & 0 \\
+ 0 & 0 & 1 & 0 & 0 & 0 & \dots & 0 & 0 & 0 \\ 
+ 0 & 0 & 0 & 1 & 0 & 0 & \dots & 0 & 0 & 0 \\ 
+ 0 & 0 & 0 & 0 & 1 & 0 & \dots & 0 & 0 & 0 \\
+ 0 & 0 & 0 & 0 & 0 & 1 & \dots & 0 & 0 & 0 \\
+ \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+ 0 & 0 & 0 & 0 & 0 & 0 & \dots & 1 & 0 & 0\\
+ 0 & 0 & 0 & 0 & 0 & 0 & \dots & 0 & 1 & 0\\
+ 0 & 0 & 0 & 0 & 0 & 0 & \dots & 0 & 0 & 1\\
+ \end{array}
+\right] = 
+\left[
+ \begin{array}{ccccc}
+ \mathbf{F}_r & \mathbf{0}_{3\times 3(N-1)} & \dots & \dots & \dots\\
+ \mathbf{0}_{3\times 3} & \mathbf{I}_{3\times 3} & \mathbf{0}_{3\times3(N-2)} & \dots & \dots\\
+ \mathbf{0}_{3\times 3} & \mathbf{0}_{3\times 3} & \mathbf{I}_{3\times 3} & \mathbf{0}_{3\times3(N-3)} & \dots\\
+ \vdots & \vdots & & & \vdots \\
+ \mathbf{0}_{3\times 3} & \mathbf{0}_{3\times 3(N-2)} & \dots & \dots & \mathbf{I}_{3\times 3} \\
+ \end{array}
+\right]
+\end{equation}
+\normalsize
+
+where the second expression is the block matrix, very useful in the SLAM formulation since the state size will always depend on the number of landmarks~$N$ seen up to the current time. 
+
+The $\mathbf{F}_r$ block is the linearization of the odometry pose prediction of a differential drive platform, computed as the time integration of the twist, $(v,w)$:
+\begin{align}
+x^{M,t} & = x^{M,t-1} + v\Delta T \cos \theta^{M,t-1} \\
+y^{M,t} & = y^{M,t-1} + v\Delta T \sin \theta^{M,t-1} \\
+\theta^{M,t} & = \theta^{M,t-1} + w\Delta T 
+\end{align} 
+
+In the other hand, the \textbf{measurement model} should relate the SLAM state with the measurement the system expects to get from its perception stage. If the homogeneous transforms of the robot and the i-th mark with respect to the map are~$\mathbf{T}^M_r$ and~$\mathbf{T}^M_i$ respectively, then the transform of the mark with respect to the robot is $\mathbf{T}^r_i$, which is directly the expected measurement of the i-th mark from the robot point of view:
+\begin{equation}
+ \mathbf{T}^M_i = \mathbf{T}^M_r \mathbf{T}^r_i; \rightarrow 
+ \mathbf{T}^r_i = (\mathbf{T}^M_r)^{-1} \mathbf{T}^M_i
+\end{equation}
+which expands to (superindex $^M$ is ommited for clarity):
+\begin{align}
+ \mathbf{T}^r_i = & 
+ \left[
+ \begin{array}{ccc}
+ c\theta_r & s\theta_r & -x_rc\theta_r-y_rs\theta_r \\
+ -s\theta_r & c\theta_r & x_rs\theta_r-y_rc\theta_r \\ 
+ 0 & 0 & 1\\
+ \end{array}
+\right]
+\left[
+\begin{array}{ccc}
+ c\theta_i & -s\theta_i & x_i \\
+ s\theta_i & c\theta_i & y_i \\
+ 0 & 0 & 1\\
+ \end{array}
+\right] = \\
+ & = 
+ \left[
+ \begin{array}{ccc}
+ c\theta_r c\theta_i+s\theta_r s\theta_i & 
+ -c\theta_r s\theta_i+s\theta_r c\theta_i & 
+ x_i c\theta_r + y_i s\theta_r - x_rc\theta_r-y_rs\theta_r \\
+ -s\theta_r c\theta_i+c\theta_r s\theta_i & 
+ s\theta_r s\theta_i+c\theta_r c\theta_i & 
+ -x_i s\theta_r + y_i s\theta_r + x_rs\theta_r-y_rc\theta_r \\
+ 0 & 0 & 1\\
+ \end{array}
+\right]
+\end{align}
+where, after some arrangements, $\mathbf{T}^r_i$ leads to the following  homogeneous transform: 
+
+\begin{equation}
+ \mathbf{T}^r_i = 
+ \left[
+ \begin{array}{ccc}
+ c(\theta_i-\theta_r) & -s(\theta_i-\theta_r) & 
+ (x_i-x_r)c\theta_r + (y_i-y_r)s\theta_r \\
+ -s(\theta_i-\theta_r) & c(\theta_i-\theta_r) & 
+ -(x_i-x_r)s\theta_r + (y_i-y_r)c\theta_r \\
+ 0 & 0 & 1\\
+ \end{array}
+\right]
+\end{equation}
+so the expected measurement of the i-th mark, given the SLAM state $\mathbf{x}$ is: 
+\begin{equation}
+ \hat{\mathbf{z}} = 
+ \left[
+ \begin{array}{c}
+ x^r_i \\
+ y^r_i \\
+ \theta^r_i \\
+ \end{array}
+\right] 
+=
+\left[
+ \begin{array}{c}
+ (x^M_i-x^M_r)c\theta^M_r + (y^M_i-y^M_r)s\theta^M_r \\
+ -(x^M_i-x^M_r)s\theta^M_r + (y^M_i-y^M_r)c\theta^M_r \\
+ \theta^M_i - \theta^M_r\\
+ \end{array}
+\right]
+\end{equation}
+Since this expression is not linear with respect to the state variables, to find the matrix $\mathbf{H}$ we have to linearize with respect to state variables:
+\begin{equation}
+ \mathbf{H}_{r,i} = 
+ \left[
+ \begin{array}{cccccccc}
+ c\theta^M_r & -s\theta^M_r & -(x^M_i-x^M_r)s\theta^M_r + (y^M_i-y^M_r)c\theta^M_r & \dots & c\theta^M_r & s\theta^M_r & 0 & \dots\\
+ s\theta^M_r & -c\theta^M_r & -(x^M_i-x^M_r)c\theta^M_r - (y^M_i-y^M_r)s\theta^M_r & \dots & -s\theta^M_r & c\theta^M_r & 0 & \dots \\
+ 0 & 0 & -1 & \dots & 0 & 0 & 1 & \dots\\
+ \end{array}
+\right] 
+\end{equation}
+where the left matrix (derivatives with respect to robot state) is $\mathbf{H}_r$, and the right part (derivatives with respect the landmark) is $\mathbf{H}_i$. Therefore the full $\mathbf{H}$ matrix is as follows:
+\begin{equation}
+ \mathbf{H} = 
+ \left[
+ \begin{array}{ccccc}
+ \mathbf{H}_r & \mathbf{H}_0 & \mathbf{0}_{3x3(N-2)} & \dots & \dots \\
+ \mathbf{H}_r & \mathbf{0}_{3x3} & \mathbf{H}_1 & \mathbf{0}_{3x3(N-3)} & \dots \\
+ \vdots & \vdots & \vdots & \vdots & \vdots \\
+ \mathbf{H}_r & \mathbf{0}_{3x3(N-2)} & \dots & \dots & \mathbf{H}_{N-1} \\
+ \end{array}
+\right] 
+\end{equation}
+
+In such SLAM Kalman filter, the correction step will be performed only for the visible marks. Other marks out of the filed of view of the sensory system will be not corrected. The SLAM state size is dynamic and will grow while new marks are seen by the robot. 
+
+
+
+
+
+
+
+
+
+\subsection{Graph SLAM}
+
+
+
