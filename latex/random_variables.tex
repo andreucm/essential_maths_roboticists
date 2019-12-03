@@ -231,9 +231,11 @@ In previous subsections we've seen that Gaussian random variables and vectors ha
 
 \paragraph{Example \theexamplecounter. Vehicle frames revisited (with uncertainty)}
 \stepcounter{examplecounter}
-Let's come back to example presented in subsection~\ref{subsec:homogeneous_matrix}. However, now we will focus only in the system vehicle-sensor-point, but we will introduce several uncertainty sources. First of all, the point~$q$ is reported by a sensor in polar coordinates $(q_r,q_{\alpha})$. The datasheet of that sensor indicates standard deviations for range measurement and azimuth~$\sigma_r$ and~$\sigma_{\alpha}$ respectively. So the covariance matrix of a point~$q$ at the measurement space $(r,\alpha)$ is:
+Let's come back to the example presented in subsection~\ref{subsec:homogeneous_matrix}. However, now we will focus only in the system vehicle-sensor-point, but we will introduce two uncertainty sources: sensor measurement noise and sensor mounting point innacuracies (which can be also called extrinsics calibration uncertainty).  
+
+First of all, the point~$\mathbf{q}$ is reported by a sensor in polar coordinates $(q_r,q_{\alpha})$. The datasheet of that sensor indicates standard deviations for range measurement and azimuth~$\sigma_r$ and~$\sigma_{\alpha}$ respectively. So the covariance matrix of a point~$q$ at the measurement space $(r,\alpha)$ is:
 \begin{equation}
- \mathbf{C}^{r\alpha}_q = 
+ \mathbf{C}_{q^{r\alpha}} = 
  \left[
  \begin{array}{cc}
  \sigma^2_r & 0                \\
@@ -241,94 +243,53 @@ Let's come back to example presented in subsection~\ref{subsec:homogeneous_matri
  \end{array}
  \right]
 \end{equation}
-Point~$q$ in the homogeneous space, with respect to the sensor frame, is computed as:
+Point~$\mathbf{q}$ in the 2D-cartesian space, with respect to the sensor frame, is computed as:
 \begin{equation}
-\left[
-\begin{array}{c}
-    \mathbf{q}_S\\
-    1 \\
- \end{array}
-\right]
+\mathbf{q}^S\\
 =
  \left[
  \begin{array}{c}
  q^S_x \\
- q^S_y \\
- 1
+ q^S_y
  \end{array}
  \right]
   =
  \left[
  \begin{array}{c}
- q_r \cos \alpha \\
- q_r \sin \alpha \\
- 1
+ q_r \cos (q_\alpha) \\
+ q_r \sin (q_\alpha) \\
  \end{array}
  \right]
 \end{equation}
-The equation above is not linear in the random variable, $[r\ \alpha]^T$, so to propagate the uncertainty from the measurement space $(r\alpha)$, to the homogeneous one $(xy1)$, we have to linearize this equation. From the section~\ref{sec:Linearization}, we learned that multivariate functions required the Jacobian to be computed in order to linearize the function around a point of interest, $(q_r,q_{\alpha})$:
+The equation above is not linear in the random variables, $[q_r, q_\alpha]^T$, so to propagate the uncertainty from the measurement space $(r,\alpha)$, to the 2D-cartesian one $(x,y)$, we have to linearize this equation. From the section~\ref{sec:Linearization}, we learned that multivariate functions require to compute the Jacobian in order to linearize the function around a point of interest, $(q_r,q_{\alpha})$:
 \begin{equation}
- \mathbf{J}_{r\alpha} = 
+ \mathbf{J}^{\mathbf{q}^S}_{r\alpha} = 
  \left[
  \begin{array}{cc}
- \cos \alpha  & -r\sin \alpha \\
- \sin \alpha  &  r\cos \alpha \\
- 0	      & 0	      \\
+ \cos (q_\alpha)  & -q_r\sin (q_\alpha) \\
+ \sin (q_\alpha)  &  q_r\cos (q_\alpha) \\
  \end{array}
  \right]
 \end{equation}
-Once we know the (approximative) linear relation between~$q^S$ and~$q^{r\alpha}$, we can propagate the uncertainty by using the properties of how Gaussian ranodm variables modify through linear systems, as discussed in subsection~\ref{subsec:mulivariate_gaussian_distribution}:
+Once we know the (approximative) linear relation between~$\mathbf{q}^S$ and~$\mathbf{q}^{r\alpha}$, we can propagate the uncertainty from the polar $(r,\alpha)$ space to the 2D-cartesian $(x,y)$ space, by using the properties of how Gaussian ranodm variables modify through linear systems, as discussed in subsection~\ref{subsec:mulivariate_gaussian_distribution}:
 \begin{equation}
- \mathbf{C}^S_q = \mathbf{J}_{r\alpha}\mathbf{C}^{r\alpha}_q\mathbf{J}_{r\alpha}^T
+ \mathbf{C}_{\mathbf{q}^S} = \mathbf{J}^{\mathbf{q}^S}_{r\alpha}\mathbf{C}_{\mathbf{q}^{r\alpha}} (\mathbf{J}^{\mathbf{q}^S}_{r\alpha})^T
 \end{equation}
-where the Jacobian has to be evaluated at the point~$(q^r,q^{\alpha})$. Thereafter, we want to compute the uncertain point~$q$ with respect to the vehicle frame. At this frame, the point is affected by two sources of uncertainty:
-\begin{itemize}
- \item Propagation of the uncertainty of $q^S$ to the new frame~$(\mathbf{C}^{B1}_q)$.
- \item New uncertainty introduced by calibration innaccuracies of sensor mounting point on-board the vehicle~$(\mathbf{C}^{B2}_q)$.
-\end{itemize}
-So the final covariance matrix of the point, with respect to the vehicle frame, would be like the sum of two contributions:
+where the Jacobian has to be evaluated at the point~$(q_r,q_{\alpha})$.
+
+At this point we have propagated the the uncertainty of the point measurement in sensor frame from the polar space to the 2D-cartesian space. But we want to compute the uncertainty of the point~$\mathbf{q}$ with respect to the vehicle frame. According to the example of vehicle frames, the expression of $\mathbf{q}^B$ is: 
 \begin{equation}
- \mathbf{C}^{B}_q = \mathbf{C}^{B1}_q + \mathbf{C}^{B2}_q
-\end{equation}
-Let's start computing $\mathbf{C}^{B1}_q$. Recalling to the example in subsection~\ref{subsec:homogeneous_matrix}, the point~$\mathbf{q}^S$ is expressed with respect to the vehicle frame as:
-\begin{equation}
-\left[
- \begin{array}{c}
-  \mathbf{q}^B\\
-  1 \\
- \end{array}
-\right] 
-= 
-\mathbf{T}^B_S 
+\label{eq:qB_expression}
 \left[
 \begin{array}{c}
-    \mathbf{q}_S\\
+    \mathbf{q}^B\\
     1 \\
  \end{array}
-\right];\\
-\end{equation}
-so in that case, the relation is linear with the random variable~$q^S$, so we can apply directly the covariance propagation equation without having to linearize:
-\begin{equation}
- \mathbf{C}^{B1}_q = \mathbf{T}^B_S \mathbf{C}^S_q (\mathbf{T}^B_S)^T
-\end{equation}
-The second term of the equation was related to errors in the calibration mounting pose (point and orientation) of the sensor withe respect to the vehicle. This errors are assumed to follow a Gaussian distribution and the three variables involved are considered to be unrelated between them, so the covariance matrix modelling this calibration error looks like:
-\begin{equation}
- \mathbf{C}^B_S = 
+\right] = 
  \left[
  \begin{array}{ccc}
- \sigma^2_{m_x} & 0 & 0  \\
- 0 & \sigma^2_{m_y} & 0 \\
- 0 & 0 & \sigma^2_{\beta} \\
- \end{array}
- \right]
-\end{equation}
-where $\sigma_{m_x},\sigma_{m_y}$ and~$\sigma_{\beta}$ are the standard deviations of the mounting pose components~$(m_x,m_y,m_{\beta})$. But in that case, point~$\mathbf{q}^B$ is not linear with respect this new random variable~$(m_x,m_y,m_{\beta})$. The relation was:
-\begin{equation}
- \mathbf{q}^B =
- \left[
- \begin{array}{ccc}
-  \cos\beta & -\sin\beta & m_x \\
-  \sin\beta & \cos\beta & m_y \\
+  \cos\beta & -\sin\beta & m^B_x \\
+  \sin\beta & \cos\beta & m^B_y \\
   0 & 0 & 1
  \end{array}
  \right]
@@ -342,33 +303,45 @@ where $\sigma_{m_x},\sigma_{m_y}$ and~$\sigma_{\beta}$ are the standard deviatio
  = 
  \left[
  \begin{array}{c}
-  q^S_x\cos\beta - q^S_y\sin\beta + m_x \\
-  q^S_x\sin\beta + q^S_y\cos\beta + m_y \\
+  q^S_x\cos\beta - q^S_y\sin\beta + m^B_x \\
+  q^S_x\sin\beta + q^S_y\cos\beta + m^B_y \\
   1
  \end{array}
  \right]
 \end{equation}
-which is clearly a non-linear relation of~$\mathbf{q}^B$ with respect to the sensor mounting pose $(m_x,m_y,\beta)$, even if it is linear with respect to~$\mathbf{q}^S$ (as it was exploited to compute $\mathbf{C}^{B1}_q$). Thus, we know that to face non-linear relations, we have to linearize, by computing the Jacobian matrix with respect to the non-linear dependencies:
+which depends on 5 uncertain variables: $(q^S_x, q^S_y, m^B_x, m^B_y, \beta)$. Again, the relation is not liinear with all the involved variables, so it is required to compute the Jacobian of the above expression, in  order to propagate uncertainty from the involved variables to the final resulting point $\mathbf{q}^B$. This Jacobian, $\mathbf{J}_{q^S,m^B,\beta}$, a $2\times 5$ matrix:
 \begin{equation}
- \mathbf{J}_{m\beta} = 
+ \mathbf{J}_{q^S,m^B,\beta} = 
+ \left[
+ \begin{array}{ccccc}
+ \cos \beta & -\sin \beta & 1 & 0 & -q^S_x\sin\beta - q^S_y\cos\beta  \\
+ \sin \beta & \cos \beta & 0 & 1 &  q^S_x\cos\beta - q^S_y\sin\beta \\
+ \end{array}
+ \right]
+ \end{equation}
+
+Covariance matrix related to $(q^S_x, q^S_y)$ is $\mathbf{C}_{\mathbf{q}^S}$, and was computed previously. Uncertainty of the sensor mounting point is represented with the covariance matrix related to $(m^B_x, m^B_y, \beta)$: 
+\begin{equation}
+ \mathbf{C}_{m^B,\beta} = 
  \left[
  \begin{array}{ccc}
- 1 & 0 & -q^S_x\sin\beta - q^S_y\cos\beta  \\
- 0 & 1 &  q^S_x\cos\beta - q^S_y\sin\beta \\
- 0 & 0 & 0
+ \sigma^2_{m_x} & 0 & 0  \\
+ 0 & \sigma^2_{m_y} & 0 \\
+ 0 & 0 & \sigma^2_{\beta} \\
  \end{array}
  \right]
 \end{equation}
-and now, we are capable to propagate the uncertainty of the calibration errors to the point coordinates in the vehicle frame: 
+So the final covariance matrix of the point $\mathbf{q}$, with respect to the vehicle frame, $\mathbf{q}^B$, is: 
 \begin{equation}
- \mathbf{C}^{B2}_q = \mathbf{J}_{m\beta}\mathbf{C}^S_q\mathbf{J}_{m\beta}^T
-\end{equation}
-So the final covariance matrix of the point~$\mathbf{q}$ with respect to the vehicle frame is:
-\begin{equation}
- \mathbf{C}^{B}_q = \mathbf{C}^{B1}_q + \mathbf{C}^{B2}_q = 
-    \mathbf{T}^B_S \mathbf{C}^S_q (\mathbf{T}^B_S)^T 
-    + 
-    \mathbf{J}_{m\beta}\mathbf{C}^S_q\mathbf{J}_{m\beta}^T
+ \mathbf{C}_{\mathbf{q^B}} = 
+ \mathbf{J}_{q^S,m^B,\beta}
+ \left[
+ \begin{array}{cc}
+ \mathbf{C}_{\mathbf{q}^S} & \left[0\right]_{2\times 3} \\
+ \left[0\right]_{3\times 2} & \mathbf{C}_{m^B,\beta} \\
+ \end{array}
+ \right]
+ \mathbf{J}_{q^S,m^B,\beta}^T
 \end{equation}
 
 The SciLab code below implements all this example and plots the ellispes related to~$\mathbf{C^S_q}$ and~$\mathbf{C^B_q}$.
