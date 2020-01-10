@@ -44,7 +44,7 @@ CqB_1 = T_LB(1:2,1:2)*CqS*T_LB(1:2,1:2)'
 Jq_B = [cos(b) -sin(b) 1 0 -r*cos(a)*sin(b)-r*sin(a)*cos(b); sin(b) cos(b) 0 1 r*cos(a)*cos(b)-r*sin(a)*sin(b)];
 
 //covariance of point q wrt Base frame through uncertainty propagation
-Cmb = [(0.001)^2 0 0; 0 (0.001)^2 0; 0 0 (0.1*%pi/180)^2];
+Cmb = [(0.003)^2 0 0; 0 (0.003)^2 0; 0 0 (0.1*%pi/180)^2];
 CqB_2 = Jq_B*[CqS zeros(2,3);zeros(3,2) Cmb]*Jq_B';
 
 disp(CqB_1);
