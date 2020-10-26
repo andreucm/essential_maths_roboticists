@@ -28,7 +28,7 @@ and the \textit{posterior} estimate, also called \textit{correction}, is the est
 Algorithm~\ref{alg:kalman_filter} summarizes the Kalman Filter, where iterations run over a predicition step and a correction one. 
 \begin{algorithm}
 \caption{Kalman Filter}
-INPUTS: $\hat{\mathbf{x}}^0,\mathbf{C}^0_x,\mathbf{F}^t,\mathbf{G}^t,\mathbf{H}^t$\\
+INPUTS: $\hat{\mathbf{x}}^0,\mathbf{C}^0_x,\mathbf{F}^t,\mathbf{G}^t,\mathbf{H}^t,\mathbf{C}^t_{n_x},\mathbf{C}^t_{n_z}$\\
 OUTPUT: $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$, at each iteration
 \begin{algorithmic}
 %\STATE INIT: $\hat{\mathbf{x}}^0,\mathbf{C}^0_x$
@@ -38,7 +38,7 @@ OUTPUT: $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$, at each iteration
 \STATE \hspace{1cm} $\hat{\mathbf{x}}^{\underline{t}} = \mathbf{F}^t\mathbf{x}^{t-1} + \mathbf{G}^t\mathbf{u}^{t}$ //Prior state estimate
 \STATE \hspace{1cm} $\mathbf{C}^{\underline{t}}_x = \mathbf{F}^t\mathbf{C}^{t-1}_x(\mathbf{F}^t)^T + \mathbf{C}^t_{n_x}$ //Prior state covariance
 \STATE \hspace{0.5cm} CORRECTION
-\STATE \hspace{1cm} $\mathbf{H}^t$ //Compute it if it is not constant
+\STATE \hspace{1cm} $\mathbf{H}^t$ //Compute it, if it is not constant
 \STATE \hspace{1cm} $\hat{\mathbf{z}}^t = \mathbf{H}^t\hat{\mathbf{x}}^{\underline{t}}$ //Compute the expected measurement 
 \STATE \hspace{1cm} $\mathbf{K}^t = \mathbf{C}^{\underline{t}}_x(\mathbf{H}^t)^T(\mathbf{H}^t\mathbf{C}^{\underline{t}}_x(\mathbf{H}^t)^T+\mathbf{C}^t_{n_z})^{-1}$ 
 //Compute the gain
