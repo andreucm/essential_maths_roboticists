@@ -1,8 +1,8 @@
 \section{Wheeled Vehicle Kinematics}
-This section is about how coordinate frames move according the geometry, velocities, rotational rates, positions and orientations of their mechanical elements. The focus is for different configurations of wheeled vehicles. The goal of each subsection is to find out the relation between the actuators (usually wheel rotation rates and/or steering angles) and the kinematic state of the vehicle, which is usually a 2D twist $(v_x, v_y, w_z)$, corresponding to forward velocity, lateral velocity and rotational rate respectively. To simplify the notation, this 2D twist will be written as $(u, v, w)$ through this section. 
+This section is about how coordinate frames move according the geometry, velocities, rotational rates, positions and orientations of their mechanical elements. The section puts the focus on  different configurations of wheeled vehicles. The goal of each subsection is to find out the relation between the actuators (usually wheel rotation rates and/or steering angles) and the kinematic state of the vehicle, which is usually a 2D twist $(v_x, v_y, w_z)$, corresponding to forward velocity, lateral velocity and rotational rate respectively. To simplify the notation, this 2D twist will be written as $(u, v, w)$ through this section. 
 
 \subsection{Forward and inverse kinematics}
-Two relations are of interest between actuators and vehicle twist: \textit{forward} and i\textit{inverse} kinematics. 
+Two relations are of interest between actuators and vehicle twist: \textit{forward} and \textit{inverse} kinematics. 
 
 Forward kinematics gets actuator values as inputs and computes the twist, while inverse kinematics computes the actuator values given a twist as input. The former is generally of interest in estimation and prediction problems, while the later is usually of interest in planning and control. 
 
@@ -23,7 +23,7 @@ In the practical situation of a vehicle rotating about a fixed frame of referenc
 \subsection{Instantaneous Center of Rotation (ICR)}
 From mechanics, we know that all planar motions of a rigid body can be described as a pure rotation about some point, called the instantaneous center of rotation (ICR). All points of the rigid body can describe its motion as a rotation about the same ICR. 
 
-For kinematics analysis, it is of special interest the center of the wheels with the floor, since these points are fixed in the vehicle frame and they also have the wheel restriction of no slippage. 
+For kinematics analysis, it is of special interest the contact point of the wheels with the floor, since these points are fixed in the vehicle frame and they also have the wheel restriction of no slippage. 
 
 
 \subsection{Single Wheel}
@@ -422,7 +422,7 @@ The above velocity vectors~$\mathbf{v_B}$, $\mathbf{u}$ and~$\mathbf{v_F}$ are e
  \end{array}
 \right]
 =
-|\mathbf{v_B}|r
+|\mathbf{v_B}|
 \left[
  \begin{array}{c}
   \cos \alpha  \\
@@ -448,7 +448,7 @@ and then, with the expression of $\mathbf{u}=\left[u_x\ u_y \right]^T$ in 2D:
  u_x = wR = \Omega_Br \cos \alpha \ ; \ \ u_y = 0; 
 \end{equation}
 
-A parctical case of double Ackermann steering (or even more than double!) is the straddle carrier family (see figure~\ref{fig:straddle_carrier}), which are large vehicles that need to manoeuver usually in tight spaces with respect to their dimensions~$L$ and~$B$. 
+A practical case of double Ackermann steering (or even more than double!) is the straddle carrier family (see figure~\ref{fig:straddle_carrier}), which are large vehicles that need to manoeuver usually in tight spaces with respect to their dimensions~$L$ and~$B$. 
 \begin{figure}[bth!]
   \begin{center}
     \includegraphics[width=0.6\columnwidth]{figures/straddle_carrier.jpg}
@@ -607,7 +607,7 @@ The four omniwheels configuration is a rather standard platform allowing high ma
 \begin{figure}[bth!]
   \begin{center}
     \includegraphics[width=1.0\columnwidth]{figures/four_omniwheels_kinematics.png}
-    \caption{Configuration for a platforme with four omniwheels in a square base of side size $2L$.}
+    \caption{Configuration for a platform with four omniwheels in a square base of side size $2L$.}
     \label{fig:four_omniwheels_kinematics}
   \end{center}
 \end{figure}
@@ -639,7 +639,10 @@ u_3 \\
 =
 \left[
 \begin{array}{ccc}
- \cos \beta_i & \sin \beta_i & -y_i\cos \beta_i+x_i \sin \beta_i
+ \cos \beta_0 & \sin \beta_0 & -y_0\cos \beta_0+x_0 \sin \beta_0 \\
+ \cos \beta_1 & \sin \beta_1 & -y_1\cos \beta_1+x_1 \sin \beta_1 \\
+ \cos \beta_2 & \sin \beta_2 & -y_2\cos \beta_2+x_2 \sin \beta_2 \\
+ \cos \beta_3 & \sin \beta_3 & -y_3\cos \beta_3+x_3 \sin \beta_3 \\
 \end{array}
 \right]
 \left[
@@ -687,12 +690,12 @@ A typical configuration using omniwheels is also that of mounting three of them 
 \begin{figure}[bth!]
   \begin{center}
     \includegraphics[width=1.0\columnwidth]{figures/three_omniwheels_kinematics.png}
-    \caption{Configuration for a platforme with three omniwheels in an equilateral triangle.}
+    \caption{Configuration for a platform with three omniwheels in an equilateral triangle.}
     \label{fig:three_omniwheels_kinematics}
   \end{center}
 \end{figure}
 
-In this case table~\ref{tab:params_3_omni} shows the constructive parameters  $x_i,y_i,B_i$: 
+In this case table~\ref{tab:params_3_omni} shows the constructive parameters  $x_i,y_i,\beta_i$: 
 \begin{table}[hbt] \centering
 \caption{Constructive parameters for triangular 3-omniwheel vehicle of side size $2L$}
 \begin{tabular}
