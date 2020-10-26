@@ -116,12 +116,12 @@ which finishes with the expression for the gain:
 The algorithm~\ref{alg:recursive_ls} summarizes all the steps for the recursive least squares approach. The algorithm requires three inputs to start looping: the initial guess for the state estimate,~$\mathbf{x}^0$, the initial guess for the covariance of the state estimate,~$\mathbf{C}^0_x$, and the measurement model,~$\mathbf{H}^t$ which may, or may not, be time dependent. The algorithm provides at the end of each iteration~$t$ the state estimate that better explain the measurements received up to~$t$, according the criterion of minimizing the trace of~$\mathbf{C}^t_x$.
 \begin{algorithm}
 \caption{Recursive Weighted Linear Least Squares}
-INPUTS: $\hat{\mathbf{x}}^0,\mathbf{C}^0_x,\mathbf{H}^t$\\
+INPUTS: $\hat{\mathbf{x}}^0,\mathbf{C}^0_x,\mathbf{H}^t,\mathbf{C}^t_{n_z}$\\
 OUTPUT: $\hat{\mathbf{x}}^t,\mathbf{C}^t_x$, at each iteration
 \begin{algorithmic}
 \STATE INIT: $\hat{\mathbf{x}}^0,\mathbf{C}^0_x$
 \STATE FOR EACH ITERATION
-\STATE \hspace{1cm} $\mathbf{H}^t$ //Compute it if it is not constant
+\STATE \hspace{1cm} $\mathbf{H}^t$ //Compute it, if it is not constant
 \STATE \hspace{1cm} $\hat{\mathbf{z}}^t = \mathbf{H}^t\hat{\mathbf{x}}^{t-1}$ //Compute the expected measurement 
 \STATE \hspace{1cm} $\mathbf{K}^t = \mathbf{C}^{t-1}_x(\mathbf{H}^t)^T(\mathbf{H}^t\mathbf{C}^{t-1}_x(\mathbf{H}^t)^T+\mathbf{C}^t_{n_z})^{-1}$ 
 //Compute the gain
@@ -330,6 +330,20 @@ Figure~\ref{fig:vw_plot_rw-ls} shows the evolution of each component of the stat
   \caption{Evolution of linear (left) and rotational (center) speeds, and trace of covariance matrix (right), while the algorithm iterates.}
   \label{fig:vw_plot_rw-ls}
 \end{figure}
+
+
+
+\subsection{Linear Least Squares on homeogeneous systems (LS-HS)}
+\label{subsec:ls_homogeneous}
+Sometimes the problem to solve has different starting situation: 
+\begin{equation}
+ \mathbf{A}\mathbf{x} = 0
+\end{equation}
+where $\mathbf{x}$ is the state vector (unknown parameters) and the matrix $\mathbf{A}$ contains the measurement data. A typical case is when estimating the parameters of an homogeneous line or plane, given a set of data points. beyond the trivial solution which is the null vectos, the lesat squares solution of such systems of equations is computed as follows through a SVD decomposition of matrix $\mathbf{A}$:
+\begin{equation}
+ \mathbf{A} = \mathbf{UDV}^T
+\end{equation}
+And the result is in the last column of matrix $\mathbf{V}$. More details on SVD can be found at subsection~\ref{subsec:matrix_svd}) of this document.
 
 
 

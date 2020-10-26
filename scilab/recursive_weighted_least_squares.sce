@@ -35,7 +35,7 @@ x_est = [0;0];
 C_x = [1 0; 0 0.2];
 
 //measurement model (constant)
-H = [1 bb/2; 1 bb/2; 1 -bb/2; 1 -bb/2;]
+H = [1 bb/2; 1 bb/2; 1 -bb/2; 1 -bb/2];
 
 //sets measurement process covariance (use values of sigma previously used to generate data)
 sigma2_v_fb = 0.005^2; //covariance front-back linear wheel speeds [m^2/s^2]
