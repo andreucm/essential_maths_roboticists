@@ -337,13 +337,13 @@ Figure~\ref{fig:vw_plot_rw-ls} shows the evolution of each component of the stat
 \label{subsec:ls_homogeneous}
 Sometimes the problem to solve has different starting situation: 
 \begin{equation}
- \mathbf{A}\mathbf{x} = 0
+ \mathbf{A}\mathbf{x} = \mathbf{0}
 \end{equation}
-where $\mathbf{x}$ is the state vector (unknown parameters) and the matrix $\mathbf{A}$ contains the measurement data. A typical case is when estimating the parameters of an homogeneous line or plane, given a set of data points. beyond the trivial solution which is the null vectos, the lesat squares solution of such systems of equations is computed as follows through a SVD decomposition of matrix $\mathbf{A}$:
+where $\mathbf{x}$ is the state vector (unknown parameters) and the matrix $\mathbf{A}$ contains the measurement data. A typical case is when estimating the parameters of an homogeneous line or plane, given a set of data points. Beyond the trivial solution, which is the null vector, the least squares solution of such systems of equations is computed through the SVD decomposition of matrix $\mathbf{A}$:
 \begin{equation}
  \mathbf{A} = \mathbf{UDV}^T
 \end{equation}
-And the result is in the last column of matrix $\mathbf{V}$. More details on SVD can be found at subsection~\ref{subsec:matrix_svd}) of this document.
+And the result for~$\mathbf{x}$ is in the last column of matrix~$\mathbf{V}$. More details on SVD can be found at subsection~\ref{subsec:matrix_svd}) of this document.
 
 
 
