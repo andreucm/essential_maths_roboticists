@@ -11,9 +11,13 @@ dt = 0.1;
 sigma_x0 = 0.5; // [m]
 sigma_y0 = 0.5; // [m]
 sigma_a0 = 0.1; // [rad]
+sigma_vx = 0.1; // [m/s] (1 cm/s)
+sigma_vy = 0.1; // [m/s] (1 cm/s)
+sigma_wz = 1*%pi/180; // [rad/s] (1º/s)
 rand("normal");//set the distribution type to the generator
-sigma_far = 1*%pi/180; // [rad]
-map = [[0;0] [0;3] [3;0] [3;3]]; // map of beacons
+sigma_far_measurement = 1*%pi/180; // [rad]
+sigma_far_likelihood = 2*%pi/180; // [rad]
+map = [[0;0] [0;3] [3;0] [3;3] [2;5] [5;2] [6;6] [0;8] [8;8]]; // map of beacons
 
 // init particle set
 p_set = []; 
@@ -24,6 +28,11 @@ for ii=1:n_p
     pw = 1/n_p; 
     p_set = [p_set [pw;px;py;pa] ]; //each column is a particle. First row weight, then x,y,theta
 end
+
+// init real robot pose
+x = x_0; 
+y = y_0; 
+a = a_0; 
 
 // init plot window
 figure('BackgroundColor',[1 1 1]);
@@ -59,39 +68,36 @@ for tt=1:n_it
         wz = -0.2;         
     end
     
+    //update the pose of the real robot
+    TM_p = [ cos(a) -sin(a) x;
+             sin(a) cos(a) y;
+             0 0 1];
+    Td =  [cos(wz*dt) -sin(wz*dt) vx*dt;
+           sin(wz*dt) cos(wz*dt) vy*dt;
+           0 0 1];
+    T = TM_p*Td; 
+    x = T(1,3);
+    y = T(2,3);        
+    a = atan(T(2,1),T(1,1));
 
-    // PREDICTION Loop, for each particle
-    rand("normal");//set the distribution type to the normal generator
-    for ii = 1:n_p
-        // Compute twist+noise for each particle
-        
-        // Predict next pose for each particle
-        // to do (exercice class 15)
-    end
-    
 
     // CORRECTION Loop, for each particle
-    sum_wi = 0; 
     for ii = 1:n_p
         // For each measurement, k
         for kk=1:size(map)(2)
-            ot = atan( map(2,kk)-y_0 , map(1,kk)-x_0 ) - a_0 + rand()*sigma_far; //real measurement with noise 
-            oe = atan( map(2,kk)-p_set(3,ii) , map(1,kk)-p_set(2,ii) ) - p_set(4,ii); //expected measurement for particle ii
-            L_oeot = erfc( abs(ot-oe)/(sqrt(2)*sigma_far) ); 
-            p_set(1,ii) = p_set(1,ii)*L_oeot; 
+            // TO DO: Exercise class 17
+            
         end
-        sum_wi = sum_wi + p_set(1,ii); 
-    end
-    for ii = 1:n_p
-        p_set(1,ii) = p_set(1,ii)/sum_wi; // normalize weights, so the sum of all is 1
-    end
-    
+    end    
        
     // PLOT particle set after correction
     drawlater(); 
-    plot(ph,p_set(2,:),p_set(3,:),".");
-    ph.isoview="on"; // isoview mode
     ph.auto_clear="on";
+    plot(ph,map(1,:),map(2,:),"go"); //beacons
+    ph.auto_clear="off";
+    plot(ph,p_set(2,:),p_set(3,:),"."); //particle set
+    plot(ph,x,y,"r+"); // robot true position
+    ph.isoview="on"; // isoview mode
     ph.auto_scale="off";
     ph.axes_visible = ["on","on","off"]
     ph.grid = [1,1];
@@ -101,6 +107,15 @@ for tt=1:n_it
     
     
     // RESAMPLING
+
+    // normalize weights, so the sum of all is 1
+    sum_wi = 0; 
+    for ii = 1:n_p
+        sum_wi = sum_wi + p_set(1,ii); 
+    end
+    for ii = 1:n_p
+        p_set(1,ii) = p_set(1,ii)/sum_wi; 
+    end
     
     // sort particle set according weigths (first particle, highest weight, and decreasing)
     p_set_sorted = gsort(p_set,'lc');
@@ -123,7 +138,7 @@ for tt=1:n_it
             end
         end
         rand("normal"); 
-        p_set_new = [p_set_new [1/n_p; p_set(2,jj)+rand()*0.03; p_set(3,jj)+rand()*0.03; p_set(4,jj)+rand()*0.01] ];         
+        p_set_new = [p_set_new [1/n_p; p_set_sorted(2,jj)+rand()*0.02; p_set_sorted(3,jj)+rand()*0.02; p_set_sorted(4,jj)+rand()*0.01]];         
     end
     p_set = p_set_new; 
     
