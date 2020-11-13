@@ -225,6 +225,7 @@ In the multivariate case, the properties around the sum and the linear operation
 
 
 \subsection{Gaussian Uncertainty Propagation}
+\label{subsec:gaussian_uncertainty_propagation}
 How uncertainty is propagated through different physical or computing processes is a major topic in robotics, specially in perception, but also in precise actuation. Specifically, we are interested in know how a density function reshapes due to some computation, view point change, ...
 
 In previous subsections we've seen that Gaussian random variables and vectors have the great property that it is easy (not only conceptually but also computationally) to compute their parameters once they pass through linear operations (product by scalar and sum). We've also seen in section~\ref{sec:Linearization} that non-linear functions can be linearized, by assuming a linearization error. Therefore, linearization and Gaussian uncertainty propagation are two operations very common in many robotics algorithms. At intuitive level, linearization remains valid as long as uncertainty is enough \textit{small} with respect to how the function changes (indicated by Jacobian). 
