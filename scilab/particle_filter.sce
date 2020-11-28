@@ -110,15 +110,20 @@ for tt=1:n_it
     
 
     // CORRECTION Loop, for each particle
-    if allow_correction    
+    if allow_correction   
+        rand("normal");//set the distribution type to the normal generator 
         for ii = 1:n_p
             // For each measurement, k
             for kk=1:size(map)(2)
                 //ot = atan( map(2,kk)-y , map(1,kk)-x ) - a + rand()*sigma_far_measurement; //real measurement with noise 
                 //oe = atan( map(2,kk)-p_set(3,ii) , map(1,kk)-p_set(2,ii) ) - p_set(4,ii); //expected measurement for particle ii
-                v1 = [map(1,kk)-x; map(2,kk)-y];
-                v2 = [map(1,kk)-p_set(2,ii); map(2,kk)-p_set(3,ii)]; 
-                diff_oe_ot = acos(v1'*v2/(norm(v1)*norm(v2))); 
+                vt = [map(1,kk)-x; map(2,kk)-y];
+                vt = v1 + [rand()*sin(sigma_far_measurement); rand()*sin(sigma_far_measurement)]; //simulated measurement
+                //alpha = atan(v1(2),v1(1)); 
+                //alpha = alpha + rand()*sigma_far_measurement; 
+                //v1 = [cos(alpha); sin(alpha)];
+                ve = [map(1,kk)-p_set(2,ii); map(2,kk)-p_set(3,ii)]; // expected measurement for particle i
+                diff_oe_ot = acos(vt'*ve/(norm(vt)*norm(ve))); //in [0,pi]
                 //diff_oe_ot = atan(sin(oe-ot),cos(oe-ot));  
                 L_oeot = erfc( diff_oe_ot/(sqrt(2)*sigma_far_likelihood) ); 
                 p_set(1,ii) = p_set(1,ii)*L_oeot; 
