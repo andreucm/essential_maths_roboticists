@@ -42,14 +42,15 @@ At $t-1$ frame, the vehicle moves with a twist $\mathbf{u}^t=[v^t_x\ v^t_y\ w^t_
 The product of the previous transformations leads to the new transformation that represents the new odometry pose at discrete time~$t$: 
 \begin{equation}
 \mathbf{T}^O_{B^t} = \mathbf{T}^O_{B^{t-1}} \cdot \mathbf{T}^{B^{t-1}}_{B^t}
+\label{eq:odometry_transform_2D}
 \end{equation}
 
 
 \subsection{Uncertainty propagation in 2D}
-Even if it comes from a filtering process, the twist is a noisy signal with a level of uncertainty. Therefore, the time integration explained in the previous subsection results in a pose with some degree of uncertainty too. To compute this uncertainty associated to the  odometry pose, given the twist unecrtainty, equation~\ref{eq:odometry_increment} has to be linearized, prior to apply the uncertainty propagation seen at subsection~\ref{subsec:gaussian_uncertainty_propagation}: 
+Even if it comes from a filtering process, the twist is a noisy signal with a level of uncertainty. Therefore, the time integration explained in the previous subsection results in a pose with some degree of uncertainty too. To compute this uncertainty associated to the  odometry pose, given the twist unecrtainty, equation~\ref{eq:odometry_transform_2D} has to be linearized with respect to the twist components, prior to apply the uncertainty propagation seen at subsection~\ref{subsec:gaussian_uncertainty_propagation}: 
 \begin{equation}
-\mathbf{J}^{\mathbf{T}^{B^{t-1}}_{B^t} }_{v^t_x, v^t_y, \theta^t}= 
-\mathbf{J}^{\mathbf{T}}_{\mathbf{x}} = 
+\mathbf{J}^{\mathbf{T}^{O}_{B^t} }_{v^t_x, v^t_y, \theta^t}= 
+\mathbf{J}^{\mathbf{T}}_{\mathbf{u}} = 
  \left[
  \begin{array}{ccc}
   cos(w_z^t\Delta\tau) & -sin(w_z^t\Delta\tau) & v_x^t\Delta\tau\\
@@ -57,18 +58,18 @@ Even if it comes from a filtering process, the twist is a noisy signal with a le
   0 & 0 & 1
  \end{array}
  \right]
- \label{eq:odometry_increment}
+ \label{eq:odometry_jacobian}
 \end{equation}
 
-If the twist covariance matrix is~$\mathbf{C}^t_{\mathbf{u}}$, then the pose covariance at discrete time~$t$ is: 
+If the twist covariance matrix ~$\mathbf{C}^t_{\mathbf{u}}$, and the pose covariance matrix at previous iteration was~$\mathbf{C}^{t-1}_{\mathbf{x}}$, then the pose covariance at discrete time~$t$ is: 
 \begin{equation}
  \mathbf{C}^t_{\mathbf{x}} = \mathbf{C}^{t-1}_{\mathbf{x}} +  
-    \mathbf{J}^{\mathbf{T}}_{\mathbf{x}}
+    \mathbf{J}^{\mathbf{T}}_{\mathbf{u}}
     \mathbf{C}^t_{\mathbf{u}}
-    (\mathbf{J}^{\mathbf{T}}_{\mathbf{x}})^T
+    (\mathbf{J}^{\mathbf{T}}_{\mathbf{u}})^T
 \end{equation}
 
-From the above equation it can be seen how the uncertainty asscoiated to the odometry pose grows over time. 
+From the above equation, it can be seen how the uncertainty associated to the odometry pose grows over time, leading to an unbounded dead reckoning pose\footnote{https://en.wikipedia.org/wiki/Dead_reckoning} estimation.
 
 
 \subsection{Twist integration in 3D}
@@ -105,6 +106,40 @@ In case of using an Inertial Measurement Unit (IMU), odometry poses are computed
 
 
 \subsection{Odometry sources}
-There are several techniques that compute the list of poses referenced to the starting frame, called the odometry frame. They can be classified between three main approaches: (i) direct pose computation, (ii) twist time integration, (iii) inertial time integration. The following table summarizes the main features of the most common approaches to solve the odometry problem. Please note that fusion of several approaches can be done and will probably lead to better results in both accuracy and robustness. 
+There are several techniques that compute the list of poses referenced to the starting frame, called the odometry frame. They can be classified between three main approaches: (i) direct pose computation, (ii) twist time integration, (iii) inertial time integration. Table~\ref{tab:odom_sources} summarizes the main features of the most common approaches to solve the odometry problem, which is an active field in research. 
+\begin{table}[hbt] \centering
+\caption{Common techniques for odometry computation.}
+\begin{tabular}
+[c]{|c|c|c|c|c|c|c|c|}
+\hline
+\rowcolor{gray}    
+Approach & Rate & Computational & Long-term & Short-term & Device & Typical \\
+\rowcolor{gray}    
+& & Complexity& drift & accuracy & mounting & application \\
+\hline
+Scan Matching & Low & High & Low & Medium & Delicate & Indoor \\
+& & & & & & wheeled\\
+\hline
+Point Cloud & Low & Very High & Very Low & High & Delicate & Outdoor\\
+registration & & & & & & wheeled\\
+\hline
+Visual & Medium & Very High & Very Low & High & Versatile & Space\\
+Odometry & & & & & & Humanoids,\\
+ & & & & & & Phones\\
+\hline
+Wheel & Medium & Low & Medium & Medium & Difficult & Wheeled\\
+Encoders & & & & & & vehicles\\
+\hline
+Stereo & Low & Medium & Low & Medium & Rough & Automotive\\
+Radar & & & & & & \\
+\hline
+IMU & High & Low & High & High & Versatile & Drones, \\
+ & & & & & & Humanoids\\
+\hline
+\end{tabular}
+\label{tab:odom_sources}
+\end{table}
+
+Please note that the above approaches show complementary features, therefore fusion of several approaches is highly recommended and leads to better results in both accuracy and robustness. 
 
 
