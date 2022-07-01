@@ -1,5 +1,6 @@
 \section{Least Squares}
-The first three subsections of this section get inspiration from the book~\cite{simon06}, which explains the linear least squares topic in three gradual steps, to finally introduce the Kalman Filter in a natural and smooth way. The same approach is followed in this section, by first presenting the Linear Least Squares, thereafter the Weighted Linear Least Squares and then the Recursive approach. The fourth subsection is devoted to non-linear least squares topic.
+The first three subsections of this section get inspiration from the book[]%~\cite{simon06}
+, which explains the linear least squares topic in three gradual steps, to finally introduce the Kalman Filter in a natural and smooth way. The same approach is followed in this section, by first presenting the Linear Least Squares, thereafter the Weighted Linear Least Squares and then the Recursive approach. The fourth subsection is devoted to non-linear least squares topic.
 
 The underlying idea and goal of the Least Squares topic is to \textit{find the system state that better explain your measurements}.
 
@@ -99,7 +100,8 @@ so the covariance matrix, by definition is the expectation of $\mathbf{e}_x\math
 \begin{equation}
  \mathbf{C}^t_{x} = \mathcal{E}\{\mathbf{e}^t_x(\mathbf{e}^t_x)^T\}
 \end{equation}
-which after some maths (see~\cite{simon06}), leads to: 
+which after some maths (see[]%~\cite{simon06})
+, leads to: 
 \begin{equation}
  \mathbf{C}^t_{x} = (\mathbf{I}-\mathbf{K}^t\mathbf{H}^t)\mathbf{C}^{t-1}_x(\mathbf{I}-\mathbf{K}^t\mathbf{H}^t)^T
 		    + \mathbf{K}^t\mathbf{C}^t_{n_z}(\mathbf{K}^t)^T

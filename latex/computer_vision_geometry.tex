@@ -1,0 +1,136 @@
+\section{Computer Vision Geometry}
+\label{sec:computer_vision_geometry}
+This section details the geometry behind the camera projections, so how 3D elements (points, lines, planes) transform from different projective views, as those taken from monocular cameras.
+
+\subsection{Homogeneous points}
+A point in 2D (or 3D) is usually represented as a vector of 2 (or 3) components, each one representing the coordinate value of the point. However there exists a useful representation consisting on adding an extra component. For a 2D point, its homogeneous representation holds the following equality: 
+\begin{equation}
+ \mathbf{x} = 
+ \left[
+ \begin{array}{c}
+  x\\
+  y\\
+  w\\
+ \end{array}
+\right] = 
+\left[
+ \begin{array}{c}
+  x/w\\
+  y/w\\
+  1\\
+ \end{array}
+\right]
+\end{equation}
+meaning that a 2D homogeneous point can be also interpreted as all 3D points in the line joining the origin and the point $[x/w\ y/w\ 1]$, so the 2D point $[x/w\ y/w]$ at plane $z=1$. 
+
+\subsection{Homogeneous 2D lines}
+
+\subsection{Homogeneous 2D point and lines relations}
+
+\subsection{Homogeneous 3D lines}
+TO DO ...
+
+
+\subsection{Homogeneous 3D planes}
+TO DO ...
+
+
+
+\subsection{Pinhole camera model}
+Pinhole model tries to parametrize the projection made by a monocular camera of the 3D world in a compact and linear way. Monocular cameras equipped with real lenses are far of being pinhole devices, but camera calibration is the process of \textit{pinholing} such real devices. 
+
+TO DO: add picture of the model
+
+The compact parameterization of the pinhole model is the camera matrix $\mathbf{K}$. It  stablishes a linear relation between homogeneous 3D metric points and their projection to image in pixels units. It has the following parameters: 
+\begin{equation}
+ \mathbf{K} = 
+ \left[
+ \begin{array}{ccc}
+  f_x & 0 & c_x \\
+  0 & f_y & c_y \\
+  0 & 0 & 1 \\
+ \end{array}
+\right]
+\end{equation}
+where $f_x,\ f_y$ are the focal length of the pinhole model multiplied by the meters to pixels ratio of the camera sensor. These two factors are usually slightly different in real lenses/camera pairs. $c_x,\ c_y$ are the image center offsets in pixels to center the projection into the image. They are close to the half of the horizontal and vertical image sizes respectively. 
+
+\subsection{3D point projection}
+A given 3D homogeneous point $\mathbf{x}^C$, expressed in the camera reference frame $\mathcal{F}^C$, can be easily projected to the image thanks to the $\mathbf{K}$ matrix as follows: 
+\begin{equation}
+ \left[
+ \begin{array}{c}
+  u\\
+  v\\
+  1\\
+ \end{array}
+ \right] = 
+ \left[
+ \begin{array}{cccc}
+  f_x & 0 & c_x & 0\\
+  0 & f_y & c_y & 0\\
+  0 & 0 & 1 & 0\\
+ \end{array}
+ \right]
+ \left[
+ \begin{array}{c}
+  x\\
+  y\\
+  z\\
+  1\\
+ \end{array}
+ \right]
+\end{equation}
+or in a more compact way: 
+\begin{equation}
+\label{eq:general_projection}
+ \mathbf{u} = \left[\mathbf{K} \vert \mathbf{0}_{3x1} \right] \mathbf{x}
+\end{equation}
+In both equations above, $\mathbf{u}$ is the 2D homogeneous point in the image corresponding to 3D point $\mathbf{x}$, and $u$ and $v$ are its horizontal and vertical coordinates in pixels.
+
+\subsection{2D image point back-projection}
+Given an homogeneous version of an image point in pixels $\mathbf{u}=(u,v,1)^T$, there are infinite 3D points that may correspond to it, $\mathbf{q}$. All these infinte 3D points lay on a ray starting at the camera center passing through the image point at image plane and going up to the infinity. In homogeneous coordinates , the weighted sum of two points is a point somewhere (depending on the weight) in the line joining them, so: 
+\begin{equation}
+\label{eq:back_projection}
+\mathbf{q}^W(\lambda) = \mathbf{P}^{+}\mathbf{u} + \lambda \mathbf{c}^W
+\end{equation}
+where $\mathbf{c}^W$ is the 3D homogeneous point of the camera center with respect to the wolrd frame, $\mathbf{P}^{+}$ is the right pseudo-inverse matrix of $\mathbf{P}$ and $\lambda$ is an aribitrary real number in $[-1,\infty]$, so the line joining $\mathbf{q}^W(\lambda)$ and $\mathbf{c}^W$ becomes a ray syarting at camera center ($\lambda = \infty$) and finishing at the infinity ($\lambda=-1$). The matrix $\mathbf{P}$ is: 
+\begin{equation}
+\label{eq:matrix_P}
+ \mathbf{P} = \left[\mathbf{K} \vert \mathbf{0}_{3x1} \right] \mathbf{T}^C_W
+\end{equation}
+with $\mathbf{T}^C_W$ is the rigid transformation of world frame with respect to camera frame, and the following fulfills : 
+\begin{equation}
+\label{eq:matrix_P_Pinv}
+\begin{array}{c}
+ \mathbf{u} = \mathbf{P} \mathbf{q}^W; \\ 
+ \mathbf{P}^+\mathbf{u} = \mathbf{P}^+\mathbf{P} \mathbf{q}^W;\\
+ \mathbf{P}^+\mathbf{u} = \mathbf{I} \mathbf{q}^W;\\
+ \mathbf{P}^+\mathbf{u} = \mathbf{q}^W;\\
+ \end{array}
+\end{equation}
+
+Since the back-projection of an image point corresponds to a 3D ray, and not to a single 3D point, the parameter $\lambda$ is not constrained. If we know at least one coordinate of the 3D point (typically $z$ for detpth cameras), then we can solve for $\lambda$ and find the unique 3D point as: 
+
+
+
+
+
+
+
+\subsection{3D line projection}
+
+\subsection{3D plane projection}
+
+\subsection{Homography mapping}
+An homography is the linear mapping existing between points lying on two diferent planes. It is represented by a $3\times 3$ matrix $\mathbf{H}$, which allows to pass from a point in one plane to its corresponding point in the other. It is typically used to stablish relations between points lying on a phisycal 3D plane to their correspondences in the image plane, or between two images of the same planar surface. 
+
+The matrix $\mathbf{H}$ has $8$ degrees of freedom (dof), since it is normalized somehow (for instance, $h_{22}=1$ or $\sum_{ij} h^2_{ij} = 1$. From the matrix $\mathbf{H}$ obtained of two images of the same planar surface, the camera pose can be retrieved. 
+
+The following procedure deduces the homography between two images of the same planar surface, from the general projection equation~\ref{eq:general_projection}. 
+
+\subsection{Fundamental Matrix} 
+
+\subsection{Intrinsics Calibration} 
+
+\subsection{Extrinsics Calibration} 
+

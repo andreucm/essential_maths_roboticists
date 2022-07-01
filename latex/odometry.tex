@@ -69,8 +69,8 @@ If the twist covariance matrix ~$\mathbf{C}^t_{\mathbf{u}}$, and the pose covari
     (\mathbf{J}^{\mathbf{T}}_{\mathbf{u}})^T
 \end{equation}
 
-From the above equation, it can be seen how the uncertainty associated to the odometry pose grows over time, leading to an unbounded dead reckoning pose\footnote{https://en.wikipedia.org/wiki/Dead_reckoning} estimation.
-
+From the above equation, it can be seen how the uncertainty associated to the odometry pose grows over time, leading to an unbounded dead reckoning pose estimation.
+%\footnote{https://en.wikipedia.org/wiki/Dead_reckoning}
 
 \subsection{Twist integration in 3D}
 Given a set of vehicle 3D twists at discrete time $t$, ~$\mathbf{u}^t=[v^t_x\ v^t_y\ v^t_z\ w^t_x \ w^t_y \ w^t_z]^T$, expressed with respect to the vehicle frame at $t$, the time integration of these twists leads to a set of poses~$\mathbf{x^t}=[\mathbf{p}^t\ \mathbf{q}^t ]=[p^t_x\ p^t_y\ p^t_z\ q^t_r\ q^t_i\ q^t_j\ q^t_k]$, referenced to the initial vehicle frame. Conceptually, the integration process in 3D is the same as the process in 2D, but in terms of operations, 3D rotations allow to work in quaternion representation, so the integration equations are as follows: 
